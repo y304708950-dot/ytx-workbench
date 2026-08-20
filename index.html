@@ -1,0 +1,1328 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>幼小衔接学习桌面</title>
+  <style>
+    :root{
+      --cream:#fffaf0; --paper:#fffdf7; --ink:#2c3440; --muted:#687484;
+      --blue:#d8ecff; --yellow:#fff0b8; --green:#e2f7d4; --pink:#fce0e9;
+      --line:#e8dfcf; --accent:#4c8fd9; --good:#25845f; --bad:#b86445;
+      --shadow:0 12px 28px rgba(68,83,103,.13);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(216,236,255,.75), transparent 30%),
+        linear-gradient(135deg,#fffaf0 0%,#f6fbff 48%,#fff9dc 100%);
+      letter-spacing:0;
+    }
+    button,input,textarea,select{font:inherit}
+    button{
+      border:0;
+      border-radius:8px;
+      min-height:44px;
+      padding:10px 14px;
+      background:#fff;
+      color:var(--ink);
+      box-shadow:0 1px 0 rgba(0,0,0,.08), inset 0 0 0 1px var(--line);
+      cursor:pointer;
+    }
+    button:hover{transform:translateY(-1px)}
+    button:disabled{opacity:.55;cursor:not-allowed;transform:none}
+    .app{min-height:100vh;display:flex}
+    .side{
+      width:22%;
+      min-width:244px;
+      max-width:340px;
+      padding:18px 14px;
+      background:rgba(255,253,247,.88);
+      border-right:1px solid var(--line);
+      position:sticky;
+      top:0;
+      height:100vh;
+      overflow:auto;
+      backdrop-filter:blur(10px);
+    }
+    .kid-card{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:14px;
+      box-shadow:var(--shadow);
+      margin-bottom:12px;
+    }
+    .kid-row{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+    .avatar{width:46px;height:46px;border-radius:8px;background:var(--blue);display:grid;place-items:center;font-size:26px}
+    .kid-name{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:9px 10px;
+      font-size:18px;
+      background:#fffdf7;
+      font-weight:700;
+    }
+    .small{font-size:13px;color:var(--muted);line-height:1.45}
+    .progress-bar{height:10px;background:#edf1f4;border-radius:999px;overflow:hidden;margin-top:8px}
+    .progress-fill{height:100%;background:linear-gradient(90deg,#7bcfa6,#63a8e6);width:0%}
+    .nav-list{display:grid;gap:8px}
+    .nav-btn{
+      width:100%;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-start;
+      text-align:left;
+      background:#fff;
+      min-height:54px;
+      font-weight:800;
+    }
+    .nav-btn.active{background:#eaf5ff;box-shadow:inset 0 0 0 2px #72aeea}
+    .nav-icon{font-size:25px;width:32px;text-align:center}
+    .nav-meta{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-top:2px}
+    .main{
+      width:78%;
+      padding:18px clamp(14px,2vw,28px) 88px;
+      overflow:auto;
+    }
+    .topline{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+    .section-title h1{font-size:clamp(25px,3vw,42px);margin:0 0 5px;line-height:1.1;letter-spacing:0}
+    .section-title p{margin:0;color:var(--muted);font-size:16px;line-height:1.45}
+    .pill{display:inline-flex;gap:6px;align-items:center;border-radius:999px;padding:7px 11px;background:#fff;border:1px solid var(--line);font-size:13px;color:var(--muted);white-space:nowrap}
+    .lesson-strip{display:flex;gap:10px;overflow:auto;padding:5px 2px 12px;margin-bottom:8px}
+    .lesson-tab{
+      flex:0 0 auto;
+      min-width:132px;
+      max-width:180px;
+      white-space:normal;
+      line-height:1.2;
+      font-weight:800;
+      background:#fff;
+    }
+    .lesson-tab.active{background:#fff5c9;box-shadow:inset 0 0 0 2px #e5b84f}
+    .workbench{
+      display:grid;
+      grid-template-columns:minmax(270px,38%) 1fr;
+      gap:16px;
+      align-items:start;
+    }
+    .panel{
+      background:rgba(255,255,255,.9);
+      border:1px solid var(--line);
+      border-radius:8px;
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .card-stage{text-align:center}
+    .card-image{font-size:52px;line-height:1.1;min-height:58px;display:grid;place-items:center;margin:4px 0}
+    .big-card{
+      min-height:132px;
+      border-radius:8px;
+      display:grid;
+      place-items:center;
+      padding:14px;
+      background:linear-gradient(180deg,#fffef8,#edf8ff);
+      border:1px solid #dcebf5;
+      font-weight:900;
+      font-size:clamp(42px,6vw,74px);
+      line-height:1.1;
+      word-break:break-word;
+    }
+    .card-title{font-size:21px;font-weight:900;margin:12px 0 6px}
+    .hint,.story{font-size:17px;line-height:1.65;color:#3f4a56}
+    .story{text-align:left;background:#fffaf0;border:1px dashed #e7ca7a;border-radius:8px;padding:12px}
+    .steps{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 0}
+    .step{background:#edf7e8;border:1px solid #c9e8bd;border-radius:999px;padding:6px 10px;font-size:14px}
+    .card-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+    .primary{background:#4c8fd9;color:#fff;box-shadow:none}
+    .soft{background:#f7fbff}
+    .good{background:#eaf8f0;color:#176b4d}
+    .warn{background:#fff1e8;color:#965034}
+    .exercise-list{display:grid;gap:12px}
+    .exercise{border:1px solid var(--line);border-radius:8px;background:#fff;padding:13px}
+    .exercise h3{font-size:18px;margin:0 0 10px;line-height:1.35}
+    .choice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(116px,1fr));gap:9px}
+    .choice-grid button{font-size:18px;font-weight:800;min-height:50px;white-space:normal}
+    .feedback{margin-top:10px;padding:10px;border-radius:8px;font-weight:800;line-height:1.45}
+    .feedback.ok{background:#eaf8f0;color:#1a6d50}
+    .feedback.no{background:#fff0e7;color:#965034}
+    .order-pick,.token-row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+    .token{background:#eef6ff;border:1px solid #cbdff1;border-radius:8px;padding:9px 11px;min-height:42px;display:inline-flex;align-items:center}
+    .match-row{display:grid;grid-template-columns:100px 1fr;gap:10px;align-items:center;margin:8px 0}
+    .left-token{font-size:22px;font-weight:900;text-align:center;background:#fff8dc;border-radius:8px;padding:10px;border:1px solid #eadc96}
+    .spot-grid,.maze-grid{display:grid;gap:6px;justify-content:start}
+    .spot-grid button,.maze-grid button{width:48px;height:48px;min-height:48px;padding:0;font-size:24px}
+    .maze-grid button.wall{background:#667085;color:#fff;cursor:not-allowed}
+    .maze-grid button.onpath{background:#d8ecff}
+    .maze-grid button.done{background:#91d7b4}
+    .memory-box{font-size:34px;font-weight:900;background:#fff8dc;border:1px solid #eadc96;border-radius:8px;padding:14px;text-align:center;margin:8px 0}
+    .results-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    .result-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px;box-shadow:var(--shadow)}
+    .result-card h3{margin:0 0 7px;font-size:19px}
+    .recent{display:grid;gap:8px;margin-top:10px}
+    .recent-item{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px;display:flex;justify-content:space-between;gap:10px}
+    .parent-entry{
+      position:fixed;right:18px;bottom:18px;z-index:20;
+      background:#2f4154;color:#fff;box-shadow:var(--shadow);font-weight:900;
+    }
+    .modal{position:fixed;inset:0;background:rgba(36,45,54,.46);z-index:30;display:none;padding:18px}
+    .modal.open{display:block}
+    .editor{
+      height:100%;
+      background:#fffdf7;
+      border-radius:8px;
+      display:grid;
+      grid-template-columns:280px 1fr;
+      overflow:hidden;
+      box-shadow:0 18px 60px rgba(0,0,0,.25);
+      border:1px solid var(--line);
+    }
+    .editor-side{border-right:1px solid var(--line);padding:12px;overflow:auto;background:#f8fbff}
+    .editor-main{padding:14px;overflow:auto}
+    .editor-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+    .tree-btn{width:100%;text-align:left;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-weight:800}
+    .tree-btn.lesson{margin-left:18px;width:calc(100% - 18px);font-weight:650;min-height:38px;font-size:14px}
+    .tree-btn.active{background:#fff0b8;box-shadow:inset 0 0 0 2px #ddb44d}
+    .field{margin:9px 0}
+    .field label{display:block;font-size:13px;color:#53606e;font-weight:800;margin-bottom:4px}
+    .field input,.field textarea,.field select{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:9px 10px;
+      background:#fff;
+      min-height:42px;
+    }
+    .field textarea{min-height:78px;resize:vertical;line-height:1.5}
+    .array-box{border:1px solid #eadfc9;border-radius:8px;margin:10px 0;padding:10px;background:#fff}
+    .array-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px}
+    .item-card{border:1px solid var(--line);background:#fffdf7;border-radius:8px;padding:10px;margin:8px 0}
+    .item-actions{display:flex;gap:6px;justify-content:flex-end;margin-bottom:8px}
+    .mini{min-height:34px;padding:6px 9px;font-size:13px}
+    .file-input{display:none}
+    @media (max-width: 760px), (orientation: portrait) {
+      .app{display:block}
+      .side{width:100%;max-width:none;min-width:0;height:auto;position:sticky;z-index:10;border-right:0;border-bottom:1px solid var(--line);padding:10px}
+      .kid-card{margin-bottom:8px;padding:10px}
+      .kid-row{margin-bottom:6px}
+      .avatar{width:38px;height:38px;font-size:22px}
+      .kid-name{font-size:16px}
+      .nav-list{display:flex;overflow:auto;gap:8px;padding-bottom:4px}
+      .nav-btn{flex:0 0 142px;min-height:50px}
+      .main{width:100%;padding:12px 10px 84px}
+      .topline{display:block}
+      .workbench{grid-template-columns:1fr}
+      .lesson-tab{min-width:126px}
+      .choice-grid{grid-template-columns:1fr 1fr}
+      .editor{grid-template-columns:1fr;height:100%}
+      .editor-side{max-height:34vh;border-right:0;border-bottom:1px solid var(--line)}
+      .editor-main{min-height:0}
+      .modal{padding:8px}
+    }
+    @media (max-width: 430px) {
+      .choice-grid{grid-template-columns:1fr}
+      .big-card{font-size:40px}
+      .spot-grid button,.maze-grid button{width:42px;height:42px;min-height:42px}
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="app"></div>
+  <button id="parentEntry" class="parent-entry" title="家长编辑">⚙️ 家长编辑</button>
+  <div id="editorModal" class="modal" aria-hidden="true"></div>
+  <script id="default-content" type="application/json">
+  {
+  "version": 1,
+  "childName": "小朋友",
+  "theme": "幼小衔接学习桌面",
+  "sections": [
+    {
+      "id": "pinyin",
+      "title": "拼音乐园",
+      "icon": "🔤",
+      "color": "#d8ecff",
+      "lessons": [
+        {
+          "id": "pinyin-initials",
+          "title": "声母小火车",
+          "icon": "🚂",
+          "type": "pinyin",
+          "objective": "认识 b p m f d t n l 这些常见声母。",
+          "cards": [
+            {"big": "b", "title": "声母 b", "image": "🧸", "hint": "像广播开头的轻短声，不拖长。", "mouth": "双唇先闭住，再轻轻打开。", "say": "b"},
+            {"big": "p", "title": "声母 p", "image": "🍑", "hint": "像吹出一口小气。", "mouth": "双唇闭住后送出气流。", "say": "p"},
+            {"big": "m", "title": "声母 m", "image": "🐴", "hint": "嘴巴闭着，声音从鼻子出来。", "mouth": "双唇闭合，鼻腔轻轻振动。", "say": "m"},
+            {"big": "f", "title": "声母 f", "image": "🍚", "hint": "上牙轻碰下唇。", "mouth": "牙齿轻碰下嘴唇，送出细气。", "say": "f"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "听家长读“b”，选出对应的声母。", "answer": "b", "options": ["b", "p", "m", "f"], "tip": "b 的嘴巴先闭住再打开。"},
+            {"kind": "choice", "prompt": "哪个声母发音时要送出明显气流？", "answer": "p", "options": ["b", "p", "m", "l"], "tip": "p 像轻轻吹蜡烛。"}
+          ]
+        },
+        {
+          "id": "pinyin-finals",
+          "title": "韵母花园",
+          "icon": "🌼",
+          "type": "pinyin",
+          "objective": "认识 a o e i u ü，并观察口型变化。",
+          "cards": [
+            {"big": "a", "title": "张大嘴 a", "image": "😮", "hint": "嘴巴张大，声音响亮。", "mouth": "嘴张大，舌头放平。", "say": "a"},
+            {"big": "o", "title": "圆圆嘴 o", "image": "⭕", "hint": "嘴唇收圆。", "mouth": "嘴唇像小圆圈。", "say": "o"},
+            {"big": "e", "title": "扁扁嘴 e", "image": "鹅", "hint": "嘴角向两边展开。", "mouth": "嘴巴半开，嘴角微微向两边。", "say": "e"},
+            {"big": "ü", "title": "小鱼嘴 ü", "image": "🐟", "hint": "像吹口哨的小圆嘴。", "mouth": "嘴唇撮圆，舌头靠前。", "say": "ü"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "发 a 时，嘴巴应该怎样？", "answer": "张大", "options": ["张大", "闭紧", "咬住下唇", "鼓起腮"], "tip": "a 是最开的大嘴音。"},
+            {"kind": "choice", "prompt": "小鱼嘴是哪一个韵母？", "answer": "ü", "options": ["u", "ü", "e", "o"], "tip": "ü 的上面有两点。"}
+          ]
+        },
+        {
+          "id": "pinyin-whole",
+          "title": "整体认读家族",
+          "icon": "🏠",
+          "type": "pinyin",
+          "objective": "直接认读 zhi chi shi ri zi ci si yi wu yu。",
+          "cards": [
+            {"big": "zhi", "title": "整体认读 zhi", "image": "🍊", "hint": "整体读，不拆开拼。", "mouth": "舌尖翘起，声音短而清楚。", "say": "zhi"},
+            {"big": "chi", "title": "整体认读 chi", "image": "🥄", "hint": "比 zhi 多一点送气。", "mouth": "舌尖翘起，送出气。", "say": "chi"},
+            {"big": "shi", "title": "整体认读 shi", "image": "🦁", "hint": "像“狮”的读音。", "mouth": "舌尖翘起，气流从舌面过。", "say": "shi"},
+            {"big": "yu", "title": "整体认读 yu", "image": "🐟", "hint": "小 ü 见到 y，去掉两点还读 ü。", "mouth": "嘴唇撮圆。", "say": "yu"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "哪个是整体认读音节？", "answer": "shi", "options": ["shi", "sh", "ia", "uo"], "tip": "shi 可以直接读出来。"},
+            {"kind": "choice", "prompt": "yu 读起来像哪个韵母？", "answer": "ü", "options": ["u", "ü", "a", "o"], "tip": "yu 是小鱼嘴。"}
+          ]
+        },
+        {
+          "id": "pinyin-tones",
+          "title": "声调滑梯",
+          "icon": "🛝",
+          "type": "pinyin",
+          "objective": "感受一声平、二声扬、三声拐弯、四声降。",
+          "cards": [
+            {"big": "mā", "title": "一声", "image": "➖", "hint": "声音平平地走。", "mouth": "音高保持平稳。", "say": "mā"},
+            {"big": "má", "title": "二声", "image": "↗️", "hint": "声音往上爬。", "mouth": "从低到高。", "say": "má"},
+            {"big": "mǎ", "title": "三声", "image": "〰️", "hint": "先低再上，像小弯钩。", "mouth": "声音拐个弯。", "say": "mǎ"},
+            {"big": "mà", "title": "四声", "image": "↘️", "hint": "声音往下落。", "mouth": "短促下降。", "say": "mà"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "“mǎ”是第几声？", "answer": "三声", "options": ["一声", "二声", "三声", "四声"], "tip": "三声有一个小弯钩。"},
+            {"kind": "choice", "prompt": "哪个声调像上坡？", "answer": "二声", "options": ["一声", "二声", "三声", "四声"], "tip": "二声从低往高走。"}
+          ]
+        },
+        {
+          "id": "pinyin-ba",
+          "title": "b 加 a",
+          "icon": "🍌",
+          "type": "pinyin",
+          "objective": "练习 b + a = ba 的拼读过程。",
+          "cards": [
+            {"big": "b + a = ba", "title": "两拼音节 ba", "image": "👄", "hint": "声母轻短，韵母响亮，连起来读 ba。", "mouth": "先闭唇发 b，再张大嘴接 a。", "say": "ba"},
+            {"big": "bā bá bǎ bà", "title": "ba 的四声", "image": "🎵", "hint": "同一个 ba，声调不同意思会变。", "mouth": "保持 ba 的口型，改变声调。", "say": "bā bá bǎ bà"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "b + a 拼成什么？", "answer": "ba", "options": ["ba", "pa", "ma", "fa"], "tip": "先 b 后 a，连起来。"},
+            {"kind": "choice", "prompt": "“爸爸”的第一个音节常读作？", "answer": "bà", "options": ["bā", "bá", "bǎ", "bà"], "tip": "爸爸的爸是四声。"}
+          ]
+        },
+        {
+          "id": "pinyin-ma",
+          "title": "m 加 a",
+          "icon": "🐴",
+          "type": "pinyin",
+          "objective": "练习 m + a = ma，并区分妈、麻、马、骂。",
+          "cards": [
+            {"big": "m + a = ma", "title": "两拼音节 ma", "image": "👩", "hint": "m 从鼻子轻轻发声，再接大嘴 a。", "mouth": "双唇闭住发 m，再张大嘴。", "say": "ma"},
+            {"big": "mā má mǎ mà", "title": "ma 的四声", "image": "🐎", "hint": "mǎ 可以想到小马。", "mouth": "读 mǎ 时声音先下再上。", "say": "mā má mǎ mà"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "“马”的拼音是哪一个？", "answer": "mǎ", "options": ["mā", "má", "mǎ", "mà"], "tip": "马是三声。"},
+            {"kind": "choice", "prompt": "m + a 拼成什么？", "answer": "ma", "options": ["ma", "mi", "mo", "mu"], "tip": "韵母是 a。"}
+          ]
+        },
+        {
+          "id": "pinyin-shi",
+          "title": "shi 小狮子",
+          "icon": "🦁",
+          "type": "pinyin",
+          "objective": "直接认读 shi，并练习四声。",
+          "cards": [
+            {"big": "shi", "title": "整体认读 shi", "image": "🦁", "hint": "看到 shi 直接读，不拆。", "mouth": "舌尖微翘，牙齿留小缝。", "say": "shi"},
+            {"big": "shī shí shǐ shì", "title": "shi 的四声", "image": "📖", "hint": "石头的石读 shí，事情的是读 shì。", "mouth": "同一口型，不同声调。", "say": "shī shí shǐ shì"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "“石头”的“石”读作？", "answer": "shí", "options": ["shī", "shí", "shǐ", "shì"], "tip": "石是二声。"},
+            {"kind": "choice", "prompt": "看到 shi 应该怎样读？", "answer": "整体读", "options": ["整体读", "拆成 s+h+i", "只读 i", "不发声"], "tip": "shi 是整体认读音节。"}
+          ]
+        },
+        {
+          "id": "pinyin-review",
+          "title": "拼读小复习",
+          "icon": "🎒",
+          "type": "pinyin",
+          "objective": "把声母、韵母和声调放在一起练习。",
+          "cards": [
+            {"big": "p + o = po", "title": "po", "image": "🥣", "hint": "p 要送气，o 要圆嘴。", "mouth": "先喷气，再圆嘴。", "say": "po"},
+            {"big": "l + u = lu", "title": "lu", "image": "🦌", "hint": "l 舌尖轻碰上牙龈，u 圆嘴。", "mouth": "舌尖一弹，嘴唇收圆。", "say": "lu"},
+            {"big": "n + ü = nü", "title": "nü", "image": "👧", "hint": "n 后面的小鱼嘴 ü 两点不能丢。", "mouth": "舌尖抵上牙龈，再撮圆嘴。", "say": "nü"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "p + o 拼成？", "answer": "po", "options": ["po", "bo", "pa", "pu"], "tip": "韵母是圆嘴 o。"},
+            {"kind": "choice", "prompt": "哪个音节保留 ü 的两点？", "answer": "nü", "options": ["nu", "nü", "yu", "wu"], "tip": "n 和 ü 在一起，两点还在。"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hanzi",
+      "title": "汉字启蒙",
+      "icon": "🈶",
+      "color": "#fff0b8",
+      "lessons": [
+        {
+          "id": "hanzi-sun-moon",
+          "title": "日月水火",
+          "icon": "☀️",
+          "type": "hanzi",
+          "objective": "用图像联想认识日、月、水、火。",
+          "cards": [
+            {"big": "日", "title": "太阳的日", "image": "☀️", "hint": "像一扇装着太阳的小窗。", "steps": ["竖", "横折", "横", "横"], "say": "日"},
+            {"big": "月", "title": "月亮的月", "image": "🌙", "hint": "像弯弯月亮慢慢变成字。", "steps": ["撇", "横折钩", "横", "横"], "say": "月"},
+            {"big": "水", "title": "水滴的水", "image": "💧", "hint": "中间像水流，两边像水花。", "steps": ["竖钩", "横撇", "撇", "捺"], "say": "水"},
+            {"big": "火", "title": "火苗的火", "image": "🔥", "hint": "两点像小火星。", "steps": ["点", "撇", "撇", "捺"], "say": "火"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "看到 ☀️，应该选哪个字？", "answer": "日", "options": ["日", "月", "水", "火"], "tip": "太阳和日有关。"},
+            {"kind": "match", "prompt": "把汉字和图片配对。", "pairs": [{"left": "日", "right": "☀️"}, {"left": "月", "right": "🌙"}, {"left": "水", "right": "💧"}, {"left": "火", "right": "🔥"}]}
+          ]
+        },
+        {
+          "id": "hanzi-nature",
+          "title": "山木田土",
+          "icon": "⛰️",
+          "type": "hanzi",
+          "objective": "认识自然里的山、木、田、土。",
+          "cards": [
+            {"big": "山", "title": "高高的山", "image": "⛰️", "hint": "三个竖像山峰。", "steps": ["竖", "竖折", "竖"], "say": "山"},
+            {"big": "木", "title": "树木的木", "image": "🌳", "hint": "一横是树冠，一竖是树干。", "steps": ["横", "竖", "撇", "捺"], "say": "木"},
+            {"big": "田", "title": "田地的田", "image": "🟫", "hint": "像被分成四块的田。", "steps": ["竖", "横折", "横", "竖", "横"], "say": "田"},
+            {"big": "土", "title": "泥土的土", "image": "🌱", "hint": "下面一横长，像大地。", "steps": ["横", "竖", "横"], "say": "土"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "“木”可以想到什么？", "answer": "树", "options": ["树", "月亮", "水杯", "火苗"], "tip": "木就是树木。"},
+            {"kind": "choice", "prompt": "哪个字像三座山峰？", "answer": "山", "options": ["山", "田", "土", "木"], "tip": "山有三个竖。"}
+          ]
+        },
+        {
+          "id": "hanzi-body",
+          "title": "人口手目",
+          "icon": "🖐️",
+          "type": "hanzi",
+          "objective": "认识身体和人的常用汉字。",
+          "cards": [
+            {"big": "人", "title": "人的人", "image": "🧍", "hint": "像一个人分开两条腿站着。", "steps": ["撇", "捺"], "say": "人"},
+            {"big": "口", "title": "嘴巴的口", "image": "👄", "hint": "像张开的嘴。", "steps": ["竖", "横折", "横"], "say": "口"},
+            {"big": "手", "title": "小手的手", "image": "🖐️", "hint": "笔画像手指和手掌。", "steps": ["撇", "横", "横", "竖钩"], "say": "手"},
+            {"big": "目", "title": "眼睛的目", "image": "👀", "hint": "比日多一横，像眼睛里的线。", "steps": ["竖", "横折", "横", "横", "横"], "say": "目"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "看到 👄，选哪个字？", "answer": "口", "options": ["口", "目", "手", "人"], "tip": "口就是嘴巴。"},
+            {"kind": "match", "prompt": "把身体字和图片配对。", "pairs": [{"left": "手", "right": "🖐️"}, {"left": "目", "right": "👀"}, {"left": "口", "right": "👄"}, {"left": "人", "right": "🧍"}]}
+          ]
+        },
+        {
+          "id": "hanzi-strokes",
+          "title": "笔画小队",
+          "icon": "✏️",
+          "type": "hanzi",
+          "objective": "认识横、竖、撇、捺、点。",
+          "cards": [
+            {"big": "一", "title": "横", "image": "➡️", "hint": "从左到右，稳稳写过去。", "steps": ["起笔", "行笔", "收笔"], "say": "横"},
+            {"big": "丨", "title": "竖", "image": "⬇️", "hint": "从上到下，像站直的小树。", "steps": ["起笔", "向下", "收笔"], "say": "竖"},
+            {"big": "丿", "title": "撇", "image": "↙️", "hint": "从右上向左下轻轻撇。", "steps": ["重起", "轻收"], "say": "撇"},
+            {"big": "丶", "title": "点", "image": "💧", "hint": "像一滴小雨点。", "steps": ["轻按", "收住"], "say": "点"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "“一”是什么笔画？", "answer": "横", "options": ["横", "竖", "撇", "点"], "tip": "平平的一笔是横。"},
+            {"kind": "choice", "prompt": "“丶”像什么？", "answer": "小雨点", "options": ["小雨点", "小山", "树干", "太阳"], "tip": "点短短的，像水滴。"}
+          ]
+        },
+        {
+          "id": "hanzi-radicals",
+          "title": "偏旁朋友",
+          "icon": "🧩",
+          "type": "hanzi",
+          "objective": "认识三点水、木字旁、口字旁、提手旁。",
+          "cards": [
+            {"big": "氵", "title": "三点水", "image": "💧", "hint": "常和水有关：河、海、洗。", "steps": ["点", "点", "提"], "say": "三点水"},
+            {"big": "木", "title": "木字旁", "image": "🌳", "hint": "常和树木有关：林、桃、桥。", "steps": ["横", "竖", "撇", "点"], "say": "木字旁"},
+            {"big": "口", "title": "口字旁", "image": "👄", "hint": "常和嘴巴说话有关：唱、吃、叫。", "steps": ["竖", "横折", "横"], "say": "口字旁"},
+            {"big": "扌", "title": "提手旁", "image": "🖐️", "hint": "常和手的动作有关：打、拍、拉。", "steps": ["横", "竖钩", "提"], "say": "提手旁"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "“河”里有哪个偏旁？", "answer": "氵", "options": ["氵", "木", "口", "扌"], "tip": "河和水有关。"},
+            {"kind": "choice", "prompt": "“拍”可能和什么有关？", "answer": "手", "options": ["手", "水", "树", "嘴"], "tip": "提手旁常表示手的动作。"}
+          ]
+        },
+        {
+          "id": "hanzi-picture",
+          "title": "看图识字",
+          "icon": "🖼️",
+          "type": "hanzi",
+          "objective": "从图片联想到汉字和意思。",
+          "cards": [
+            {"big": "云", "title": "白云的云", "image": "☁️", "hint": "天空里轻轻飘。", "steps": ["横", "横", "撇折", "点"], "say": "云"},
+            {"big": "雨", "title": "下雨的雨", "image": "🌧️", "hint": "里面四点像雨滴。", "steps": ["横", "竖", "横折钩", "竖", "点", "点", "点", "点"], "say": "雨"},
+            {"big": "鸟", "title": "小鸟的鸟", "image": "🐦", "hint": "有头、有身子、有尾巴。", "steps": ["撇", "横折钩", "点", "竖折折钩", "横"], "say": "鸟"},
+            {"big": "虫", "title": "小虫的虫", "image": "🐛", "hint": "小虫爬呀爬。", "steps": ["竖", "横折", "横", "竖", "提", "点"], "say": "虫"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "🌧️ 对应哪个字？", "answer": "雨", "options": ["云", "雨", "鸟", "虫"], "tip": "雨里面有雨点。"},
+            {"kind": "choice", "prompt": "哪个字和 🐦 有关？", "answer": "鸟", "options": ["鸟", "虫", "云", "田"], "tip": "小鸟会飞。"}
+          ]
+        },
+        {
+          "id": "hanzi-match",
+          "title": "汉字配对",
+          "icon": "🔗",
+          "type": "hanzi",
+          "objective": "把汉字、图片、词语放在一起理解。",
+          "cards": [
+            {"big": "大", "title": "大小的大", "image": "👐", "hint": "张开手臂像一个大字。", "steps": ["横", "撇", "捺"], "say": "大"},
+            {"big": "小", "title": "大小的小", "image": "🤏", "hint": "中间一竖，两边小点。", "steps": ["竖钩", "撇", "点"], "say": "小"},
+            {"big": "上", "title": "上面的上", "image": "⬆️", "hint": "竖在横的上面。", "steps": ["竖", "横", "横"], "say": "上"},
+            {"big": "下", "title": "下面的下", "image": "⬇️", "hint": "点在横的下面。", "steps": ["横", "竖", "点"], "say": "下"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "哪个字表示“上面”？", "answer": "上", "options": ["上", "下", "大", "小"], "tip": "箭头向上。"},
+            {"kind": "match", "prompt": "把意思和汉字配对。", "pairs": [{"left": "大", "right": "👐"}, {"left": "小", "right": "🤏"}, {"left": "上", "right": "⬆️"}, {"left": "下", "right": "⬇️"}]}
+          ]
+        },
+        {
+          "id": "hanzi-life",
+          "title": "生活常见字",
+          "icon": "🏫",
+          "type": "hanzi",
+          "objective": "认识入学常见提示字。",
+          "cards": [
+            {"big": "开", "title": "打开的开", "image": "🚪", "hint": "开门、开学、开心。", "steps": ["横", "横", "撇", "竖"], "say": "开"},
+            {"big": "关", "title": "关门的关", "image": "🚪", "hint": "离开教室要关灯关门。", "steps": ["点", "撇", "横", "横", "撇", "捺"], "say": "关"},
+            {"big": "书", "title": "图书的书", "image": "📚", "hint": "书本里有故事和知识。", "steps": ["横折", "横折钩", "竖", "点"], "say": "书"},
+            {"big": "学", "title": "学习的学", "image": "🎒", "hint": "上学、学习、同学。", "steps": ["点点", "宝盖", "子"], "say": "学"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "“上学”的“学”是哪一个？", "answer": "学", "options": ["学", "书", "开", "关"], "tip": "背书包去上学。"},
+            {"kind": "choice", "prompt": "离开房间要做什么？", "answer": "关门", "options": ["关门", "开水", "画山", "数云"], "tip": "安全又节约。"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reading",
+      "title": "阅读表达",
+      "icon": "📚",
+      "color": "#e2f7d4",
+      "lessons": [
+        {
+          "id": "read-rain",
+          "title": "小雨滴排队",
+          "icon": "🌧️",
+          "type": "reading",
+          "objective": "听短故事，回答谁、在哪里、做什么。",
+          "cards": [
+            {"title": "原创小故事", "image": "🌧️🌱", "story": "早晨，小雨滴排着队落下来。它们落在小草上，小草伸了伸腰；落在花朵上，花朵笑了。雨停后，天空出现了一道彩虹。", "say": "小雨滴排着队落下来，小草和花朵都很开心。"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "小雨滴落在谁身上？", "answer": "小草和花朵", "options": ["小草和花朵", "书包和铅笔", "月亮和星星", "杯子和盘子"], "tip": "故事里小草伸腰，花朵笑了。"},
+            {"kind": "choice", "prompt": "雨停后天空出现了什么？", "answer": "彩虹", "options": ["彩虹", "大雪", "小船", "火车"], "tip": "彩虹常在雨后出现。"},
+            {"kind": "speak", "prompt": "说一说：如果你是一滴小雨滴，你想落在哪里？"}
+          ]
+        },
+        {
+          "id": "read-lost-hat",
+          "title": "帽子找主人",
+          "icon": "🧢",
+          "type": "reading",
+          "objective": "练习按顺序复述故事。",
+          "cards": [
+            {"title": "原创小故事", "image": "🧢🍃", "story": "操场上有一顶蓝帽子。风一吹，帽子滚到树下。小明捡起来，问大家：这是谁的帽子？小兰摸摸头，笑着说：是我的，谢谢你。", "say": "小明在操场上帮小兰找回帽子。"}
+          ],
+          "exercises": [
+            {"kind": "order", "prompt": "给故事排顺序。", "answer": ["帽子在操场上", "帽子滚到树下", "小明捡起帽子", "小兰说谢谢"], "options": ["小兰说谢谢", "帽子滚到树下", "帽子在操场上", "小明捡起帽子"], "tip": "先发生地点，再发生动作。"},
+            {"kind": "choice", "prompt": "小明做了一件什么事？", "answer": "帮助别人", "options": ["帮助别人", "乱扔帽子", "摘花", "睡觉"], "tip": "他帮帽子找到主人。"},
+            {"kind": "speak", "prompt": "说一说：别人帮你时，你可以怎么说？"}
+          ]
+        },
+        {
+          "id": "read-seed",
+          "title": "种子醒了",
+          "icon": "🌱",
+          "type": "reading",
+          "objective": "理解变化过程。",
+          "cards": [
+            {"title": "原创小故事", "image": "🌰💧☀️🌱", "story": "一粒小种子睡在泥土里。春风来了，春雨来了，太阳也来了。小种子喝饱水，暖暖身子，慢慢探出绿色的小脑袋。", "say": "种子在春天发芽了。"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "谁睡在泥土里？", "answer": "小种子", "options": ["小种子", "小鱼", "小猫", "小车"], "tip": "故事开头说一粒小种子。"},
+            {"kind": "order", "prompt": "种子发芽前后顺序是？", "answer": ["睡在泥土里", "喝饱水", "暖暖身子", "探出小脑袋"], "options": ["探出小脑袋", "睡在泥土里", "暖暖身子", "喝饱水"], "tip": "先睡着，再被雨和太阳唤醒。"},
+            {"kind": "speak", "prompt": "说一说：你见过什么植物发芽？"}
+          ]
+        },
+        {
+          "id": "read-market",
+          "title": "热闹的菜市场",
+          "icon": "🥕",
+          "type": "reading",
+          "objective": "积累颜色和食物词语。",
+          "cards": [
+            {"title": "原创小故事", "image": "🥕🥬🍅", "story": "菜市场真热闹。红红的番茄像小灯笼，绿绿的青菜排成队，橙色的胡萝卜躺在篮子里。妈妈说：我们买些新鲜蔬菜回家吧。", "say": "菜市场里有许多颜色的蔬菜。"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "番茄像什么？", "answer": "小灯笼", "options": ["小灯笼", "小鞋子", "小雨伞", "小尺子"], "tip": "红红圆圆像灯笼。"},
+            {"kind": "choice", "prompt": "故事里没有提到哪种食物？", "answer": "苹果", "options": ["番茄", "青菜", "胡萝卜", "苹果"], "tip": "苹果是水果，故事没写。"},
+            {"kind": "speak", "prompt": "说一说：你喜欢吃哪种蔬菜？它是什么颜色？"}
+          ]
+        },
+        {
+          "id": "read-zoo",
+          "title": "动物园早安",
+          "icon": "🦒",
+          "type": "reading",
+          "objective": "抓住动物特点。",
+          "cards": [
+            {"title": "原创小故事", "image": "🐘🦒🐒", "story": "动物园醒来了。长颈鹿伸长脖子吃树叶，大象用鼻子喷水，小猴子在树枝上荡来荡去。小朋友们轻轻走路，不打扰动物。", "say": "动物们有不同的本领。"}
+          ],
+          "exercises": [
+            {"kind": "match", "prompt": "动物和本领配对。", "pairs": [{"left": "长颈鹿", "right": "伸长脖子"}, {"left": "大象", "right": "用鼻子喷水"}, {"left": "小猴子", "right": "荡来荡去"}]},
+            {"kind": "choice", "prompt": "参观动物园时应该怎样？", "answer": "轻轻走路", "options": ["轻轻走路", "大声吵闹", "乱喂食物", "追着动物跑"], "tip": "不打扰动物。"},
+            {"kind": "speak", "prompt": "说一说：你最想观察哪种动物？为什么？"}
+          ]
+        },
+        {
+          "id": "read-schoolbag",
+          "title": "书包里的朋友",
+          "icon": "🎒",
+          "type": "reading",
+          "objective": "认识学习用品并练习分类表达。",
+          "cards": [
+            {"title": "原创小故事", "image": "🎒✏️📏", "story": "晚上，书包张开小口。铅笔说：我会写字。橡皮说：我会帮忙改错。尺子说：我会画直线。第二天，它们一起陪小朋友去上学。", "say": "学习用品各有用处。"}
+          ],
+          "exercises": [
+            {"kind": "match", "prompt": "学习用品和作用配对。", "pairs": [{"left": "铅笔", "right": "写字"}, {"left": "橡皮", "right": "改错"}, {"left": "尺子", "right": "画直线"}]},
+            {"kind": "choice", "prompt": "谁会画直线？", "answer": "尺子", "options": ["尺子", "橡皮", "书包", "水杯"], "tip": "尺子边是直的。"},
+            {"kind": "speak", "prompt": "说一说：上学前你会检查书包里的什么？"}
+          ]
+        },
+        {
+          "id": "read-sentence",
+          "title": "句子排排队",
+          "icon": "🧱",
+          "type": "reading",
+          "objective": "理解谁、在哪里、做什么。",
+          "cards": [
+            {"title": "句子积木", "image": "👧🏫📖", "story": "一个完整的小句子常常会说清楚：谁，在哪里，做什么。比如：小兰在教室里读书。", "say": "小兰在教室里读书。"}
+          ],
+          "exercises": [
+            {"kind": "order", "prompt": "把词语排成通顺的句子。", "answer": ["小兰", "在教室里", "读书"], "options": ["读书", "小兰", "在教室里"], "tip": "先说谁，再说在哪里，最后说做什么。"},
+            {"kind": "order", "prompt": "再排一个句子。", "answer": ["小猫", "在垫子上", "睡觉"], "options": ["睡觉", "在垫子上", "小猫"], "tip": "谁在前面。"},
+            {"kind": "speak", "prompt": "说一说：用“我在……做……”说一句话。"}
+          ]
+        },
+        {
+          "id": "read-picture-talk",
+          "title": "看图讲一讲",
+          "icon": "🗣️",
+          "type": "reading",
+          "objective": "观察画面元素，练习完整表达。",
+          "cards": [
+            {"title": "画面", "image": "🌳🧒🪁🐶", "story": "公园里有一棵大树。小朋友在放风筝，小狗在草地旁边跑。天空很蓝，大家玩得很开心。", "say": "公园里，小朋友放风筝，小狗在跑。"}
+          ],
+          "exercises": [
+            {"kind": "choice", "prompt": "画面发生在哪里？", "answer": "公园", "options": ["公园", "厨房", "医院", "车站"], "tip": "有树、有草地、可以放风筝。"},
+            {"kind": "choice", "prompt": "小朋友在做什么？", "answer": "放风筝", "options": ["放风筝", "刷牙", "写字", "睡觉"], "tip": "看 🪁。"},
+            {"kind": "speak", "prompt": "说一说：用三句话讲讲这幅图。"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "math",
+      "title": "数学思维",
+      "icon": "🔢",
+      "color": "#e0f1ff",
+      "lessons": [
+        {"id": "math-count", "title": "1-20 数一数", "icon": "🧮", "type": "math", "objective": "点数物品，并把数量和数字对应。", "cards": [{"big": "1-20", "title": "一个一个数", "image": "🍎🍎🍎", "hint": "手指点到哪里，嘴巴数到哪里。", "say": "一 二 三 四 五"}], "generator": {"kind": "count", "min": 1, "max": 20, "items": ["🍎", "⭐", "🟡", "🌼"]}},
+        {"id": "math-number", "title": "数字读写", "icon": "✍️", "type": "math", "objective": "认识数字形状，读出 0-20。", "cards": [{"big": "8", "title": "数字 8", "image": "⛄", "hint": "像上下两个小圆圈。", "say": "八"}, {"big": "10", "title": "数字 10", "image": "🔟", "hint": "1 和 0 做朋友。", "say": "十"}], "generator": {"kind": "number", "min": 0, "max": 20}},
+        {"id": "math-quantity", "title": "数量对应", "icon": "🍓", "type": "math", "objective": "把实物数量和数字连起来。", "cards": [{"big": "5 = 🍓🍓🍓🍓🍓", "title": "数字和数量", "image": "🍓", "hint": "数完以后，选一样的数字。", "say": "五个草莓"}], "generator": {"kind": "quantity", "min": 1, "max": 12, "items": ["🍓", "🥕", "🚗", "🧸"]}},
+        {"id": "math-compare", "title": "比大小多少", "icon": "⚖️", "type": "math", "objective": "比较两个数量或数字，知道多、少、一样多。", "cards": [{"big": "7 > 4", "title": "大于小于", "image": "🐊", "hint": "开口朝向大的数。", "say": "七比四大"}], "generator": {"kind": "compare", "min": 1, "max": 20}},
+        {"id": "math-addsub", "title": "加减法小店", "icon": "➕", "type": "math", "objective": "理解 10 以内加减，尝试 20 以内简单计算。", "cards": [{"big": "3 + 2 = 5", "title": "合起来是加法", "image": "🍪🍪🍪 ➕ 🍪🍪", "hint": "先数左边，再接着数右边。", "say": "三加二等于五"}, {"big": "6 - 2 = 4", "title": "拿走是减法", "image": "🍪🍪🍪🍪", "hint": "从一堆里拿走一些，看看还剩几个。", "say": "六减二等于四"}], "generator": {"kind": "addsub", "min": 1, "max": 10}},
+        {"id": "math-classify", "title": "分类整理", "icon": "🧺", "type": "math", "objective": "按颜色、形状、用途分类。", "cards": [{"big": "分类", "title": "找共同点", "image": "🔴🟡🔺⭐", "hint": "可以按颜色、形状、用途来分。", "say": "按共同点分类"}], "exercises": [{"kind": "classify", "prompt": "把物品分到正确类别。", "groups": [{"name": "水果", "items": ["🍎", "🍌", "🍇"]}, {"name": "文具", "items": ["✏️", "📏", "📚"]}]}]},
+        {"id": "math-pattern", "title": "找规律", "icon": "🔁", "type": "math", "objective": "观察重复规律，找到下一个。", "cards": [{"big": "🔴 🔵 🔴 🔵 ?", "title": "颜色规律", "image": "🔴🔵", "hint": "先看一组，再看它怎么重复。", "say": "红蓝红蓝，下一个是红"}], "generator": {"kind": "pattern"}},
+        {"id": "math-shapes", "title": "图形朋友", "icon": "🔺", "type": "math", "objective": "认识圆形、三角形、正方形、长方形。", "cards": [{"big": "○ △ □ ▭", "title": "基本图形", "image": "🔴🔺🟦", "hint": "看边和角：圆没有角，三角形有三个角。", "say": "圆形 三角形 正方形 长方形"}], "exercises": [{"kind": "choice", "prompt": "哪个图形有三个角？", "answer": "三角形", "options": ["三角形", "圆形", "正方形", "长方形"], "tip": "三角形有三条边。"}, {"kind": "choice", "prompt": "钟面通常像什么图形？", "answer": "圆形", "options": ["圆形", "三角形", "长方形", "梯形"], "tip": "钟面圆圆的。"}]},
+        {"id": "math-position", "title": "空间方位", "icon": "🧭", "type": "math", "objective": "理解上、下、左、右、前、后。", "cards": [{"big": "上 下 左 右", "title": "方位词", "image": "⬆️⬇️⬅️➡️", "hint": "先找到自己，再说方向。", "say": "上 下 左 右"}], "exercises": [{"kind": "choice", "prompt": "🐱 在桌子上，应该选哪个方位？", "answer": "上", "options": ["上", "下", "左", "右"], "tip": "桌面上面。"}, {"kind": "choice", "prompt": "⬅️ 表示哪个方向？", "answer": "左", "options": ["左", "右", "上", "下"], "tip": "箭头指向左边。"}]},
+        {"id": "math-time-money", "title": "时间和人民币", "icon": "🕘", "type": "math", "objective": "认识整点、半点和简单人民币。", "cards": [{"big": "8:00", "title": "整点", "image": "🕗", "hint": "分针指 12，时针指几就是几点。", "say": "八点"}, {"big": "1元 = 10角", "title": "人民币", "image": "🪙", "hint": "买东西时要看价格和钱数。", "say": "一元等于十角"}], "exercises": [{"kind": "choice", "prompt": "🕘 表示几点？", "answer": "9点", "options": ["9点", "3点", "6点", "12点"], "tip": "短针指 9，长针指 12。"}, {"kind": "choice", "prompt": "买 3 元铅笔，可以用哪张钱？", "answer": "3元", "options": ["3元", "1角", "2角", "0元"], "tip": "价格是 3 元。"}]}
+      ]
+    },
+    {
+      "id": "english",
+      "title": "英语启蒙",
+      "icon": "🍎",
+      "color": "#fce0e9",
+      "lessons": [
+        {"id": "eng-letters", "title": "字母 ABC", "icon": "🔠", "type": "english", "objective": "认识 A-F 的字母名和常见发音。", "cards": [{"big": "A a", "title": "A says /æ/", "image": "🍎", "hint": "apple /ˈæpəl/ 苹果", "say": "apple"}, {"big": "B b", "title": "B says /b/", "image": "⚽", "hint": "ball /bɔːl/ 球", "say": "ball"}, {"big": "C c", "title": "C says /k/", "image": "🐱", "hint": "cat /kæt/ 猫", "say": "cat"}], "exercises": [{"kind": "choice", "prompt": "Apple 开头是哪个字母？", "answer": "A", "options": ["A", "B", "C", "D"], "tip": "A a apple."}, {"kind": "choice", "prompt": "Cat 的中文意思是？", "answer": "猫", "options": ["猫", "狗", "球", "鱼"], "tip": "cat 是猫。"}]},
+        {"id": "eng-colors", "title": "颜色单词", "icon": "🎨", "type": "english", "objective": "认识 red, yellow, blue, green。", "cards": [{"big": "red", "title": "red /red/", "image": "🔴", "hint": "红色", "say": "red"}, {"big": "yellow", "title": "yellow /ˈjeloʊ/", "image": "🟡", "hint": "黄色", "say": "yellow"}, {"big": "blue", "title": "blue /bluː/", "image": "🔵", "hint": "蓝色", "say": "blue"}, {"big": "green", "title": "green /ɡriːn/", "image": "🟢", "hint": "绿色", "say": "green"}], "exercises": [{"kind": "choice", "prompt": "🔵 是什么颜色？", "answer": "blue", "options": ["blue", "red", "yellow", "green"], "tip": "blue 是蓝色。"}, {"kind": "match", "prompt": "颜色配对。", "pairs": [{"left": "red", "right": "🔴"}, {"left": "yellow", "right": "🟡"}, {"left": "blue", "right": "🔵"}, {"left": "green", "right": "🟢"}]}]},
+        {"id": "eng-animals", "title": "动物朋友", "icon": "🐶", "type": "english", "objective": "认识 dog, cat, bird, fish。", "cards": [{"big": "dog", "title": "dog /dɔːɡ/", "image": "🐶", "hint": "小狗", "say": "dog"}, {"big": "cat", "title": "cat /kæt/", "image": "🐱", "hint": "小猫", "say": "cat"}, {"big": "bird", "title": "bird /bɜːrd/", "image": "🐦", "hint": "小鸟", "say": "bird"}, {"big": "fish", "title": "fish /fɪʃ/", "image": "🐟", "hint": "鱼", "say": "fish"}], "exercises": [{"kind": "choice", "prompt": "🐟 的英文是？", "answer": "fish", "options": ["fish", "dog", "cat", "bird"], "tip": "fish 在水里游。"}, {"kind": "choice", "prompt": "dog 是什么动物？", "answer": "小狗", "options": ["小狗", "小猫", "小鸟", "小鱼"], "tip": "dog 汪汪叫。"}]},
+        {"id": "eng-family", "title": "家庭称呼", "icon": "👨‍👩‍👧", "type": "english", "objective": "认识 mom, dad, baby, family。", "cards": [{"big": "mom", "title": "mom /mɑːm/", "image": "👩", "hint": "妈妈", "say": "mom"}, {"big": "dad", "title": "dad /dæd/", "image": "👨", "hint": "爸爸", "say": "dad"}, {"big": "baby", "title": "baby /ˈbeɪbi/", "image": "👶", "hint": "宝宝", "say": "baby"}, {"big": "family", "title": "family /ˈfæməli/", "image": "👨‍👩‍👧", "hint": "家人", "say": "family"}], "exercises": [{"kind": "choice", "prompt": "dad 的中文是？", "answer": "爸爸", "options": ["爸爸", "妈妈", "宝宝", "老师"], "tip": "dad 是爸爸。"}, {"kind": "choice", "prompt": "family 表示？", "answer": "家人", "options": ["家人", "颜色", "水果", "身体"], "tip": "一家人在一起。"}]},
+        {"id": "eng-food", "title": "好吃的食物", "icon": "🥛", "type": "english", "objective": "认识 apple, milk, bread, egg。", "cards": [{"big": "apple", "title": "apple /ˈæpəl/", "image": "🍎", "hint": "苹果", "say": "apple"}, {"big": "milk", "title": "milk /mɪlk/", "image": "🥛", "hint": "牛奶", "say": "milk"}, {"big": "bread", "title": "bread /bred/", "image": "🍞", "hint": "面包", "say": "bread"}, {"big": "egg", "title": "egg /eɡ/", "image": "🥚", "hint": "鸡蛋", "say": "egg"}], "exercises": [{"kind": "choice", "prompt": "🥛 的英文是？", "answer": "milk", "options": ["milk", "egg", "bread", "apple"], "tip": "milk 是牛奶。"}, {"kind": "match", "prompt": "食物配对。", "pairs": [{"left": "apple", "right": "🍎"}, {"left": "milk", "right": "🥛"}, {"left": "bread", "right": "🍞"}, {"left": "egg", "right": "🥚"}]}]},
+        {"id": "eng-body", "title": "身体部位", "icon": "👀", "type": "english", "objective": "认识 eye, ear, hand, foot。", "cards": [{"big": "eye", "title": "eye /aɪ/", "image": "👁️", "hint": "眼睛", "say": "eye"}, {"big": "ear", "title": "ear /ɪr/", "image": "👂", "hint": "耳朵", "say": "ear"}, {"big": "hand", "title": "hand /hænd/", "image": "🖐️", "hint": "手", "say": "hand"}, {"big": "foot", "title": "foot /fʊt/", "image": "🦶", "hint": "脚", "say": "foot"}], "exercises": [{"kind": "choice", "prompt": "hand 是哪个部位？", "answer": "手", "options": ["手", "脚", "眼睛", "耳朵"], "tip": "hand 可以挥一挥。"}, {"kind": "choice", "prompt": "👂 的英文是？", "answer": "ear", "options": ["ear", "eye", "hand", "foot"], "tip": "ear 用来听。"}]},
+        {"id": "eng-greetings", "title": "打招呼", "icon": "👋", "type": "english", "objective": "认识 hello, goodbye, thank you。", "cards": [{"big": "Hello!", "title": "hello /həˈloʊ/", "image": "👋", "hint": "你好", "say": "hello"}, {"big": "Goodbye!", "title": "goodbye /ˌɡʊdˈbaɪ/", "image": "🙋", "hint": "再见", "say": "goodbye"}, {"big": "Thank you!", "title": "thank you /θæŋk juː/", "image": "🙏", "hint": "谢谢你", "say": "thank you"}], "exercises": [{"kind": "choice", "prompt": "见到朋友可以说？", "answer": "Hello!", "options": ["Hello!", "Goodbye!", "Red!", "Dog!"], "tip": "hello 是你好。"}, {"kind": "choice", "prompt": "别人帮助你，可以说？", "answer": "Thank you!", "options": ["Thank you!", "Blue!", "Cat!", "One!"], "tip": "thank you 是谢谢。"}]},
+        {"id": "eng-objects", "title": "教室物品", "icon": "✏️", "type": "english", "objective": "认识 book, pencil, bag, chair。", "cards": [{"big": "book", "title": "book /bʊk/", "image": "📘", "hint": "书", "say": "book"}, {"big": "pencil", "title": "pencil /ˈpensəl/", "image": "✏️", "hint": "铅笔", "say": "pencil"}, {"big": "bag", "title": "bag /bæɡ/", "image": "🎒", "hint": "书包", "say": "bag"}, {"big": "chair", "title": "chair /tʃer/", "image": "🪑", "hint": "椅子", "say": "chair"}], "exercises": [{"kind": "choice", "prompt": "book 是？", "answer": "书", "options": ["书", "铅笔", "椅子", "书包"], "tip": "book 可以读。"}, {"kind": "choice", "prompt": "🎒 的英文是？", "answer": "bag", "options": ["bag", "chair", "pencil", "book"], "tip": "bag 装书本。"}]}
+      ]
+    },
+    {
+      "id": "science",
+      "title": "科学常识",
+      "icon": "🔍",
+      "color": "#daf5e5",
+      "lessons": [
+        {"id": "sci-seasons", "title": "四季变化", "icon": "🌸", "type": "science", "objective": "观察春夏秋冬的天气和生活变化。", "cards": [{"big": "春 夏 秋 冬", "title": "四季", "image": "🌸☀️🍂❄️", "hint": "春天发芽，夏天炎热，秋天落叶，冬天寒冷。", "say": "春夏秋冬"}], "exercises": [{"kind": "choice", "prompt": "树叶变黄、果实成熟，常见于哪个季节？", "answer": "秋天", "options": ["春天", "夏天", "秋天", "冬天"], "tip": "秋天常有落叶和果实。"}, {"kind": "choice", "prompt": "堆雪人常在？", "answer": "冬天", "options": ["冬天", "夏天", "春天", "秋天"], "tip": "冬天天气冷，可能下雪。"}]},
+        {"id": "sci-weather", "title": "天气观察", "icon": "⛅", "type": "science", "objective": "认识晴、雨、风、雪，并选择合适用品。", "cards": [{"big": "天气", "title": "观察天空", "image": "☀️🌧️💨❄️", "hint": "看云、风、雨和温度，可以判断天气。", "say": "晴天 雨天 刮风 下雪"}], "exercises": [{"kind": "choice", "prompt": "下雨天出门最好带什么？", "answer": "雨伞", "options": ["雨伞", "太阳镜", "泳圈", "风筝"], "tip": "雨伞可以挡雨。"}, {"kind": "judge", "prompt": "刮大风时在高楼下追塑料袋很安全。", "answer": false, "tip": "大风天要远离危险物。"}]},
+        {"id": "sci-animals", "title": "动物怎么生活", "icon": "🐾", "type": "science", "objective": "观察动物的身体特点和生活环境。", "cards": [{"big": "动物", "title": "身体本领", "image": "🐟🐦🐰", "hint": "鱼有鳍，鸟有翅膀，兔子后腿有力。", "say": "动物有不同本领"}], "exercises": [{"kind": "match", "prompt": "动物和特点配对。", "pairs": [{"left": "鱼", "right": "有鳍"}, {"left": "鸟", "right": "有翅膀"}, {"left": "兔子", "right": "会跳"}]}, {"kind": "choice", "prompt": "鱼主要生活在哪里？", "answer": "水里", "options": ["水里", "树上", "沙发上", "天空中"], "tip": "鱼用鳍游泳。"}]},
+        {"id": "sci-plants", "title": "植物长大", "icon": "🌿", "type": "science", "objective": "知道植物需要阳光、水和空气。", "cards": [{"big": "种子 -> 小苗 -> 花", "title": "植物成长", "image": "🌰🌱🌼", "hint": "植物慢慢长大，需要照顾。", "say": "植物需要阳光和水"}], "exercises": [{"kind": "choice", "prompt": "植物生长通常需要什么？", "answer": "阳光和水", "options": ["阳光和水", "糖果和玩具", "电视和手机", "石头和纸"], "tip": "给植物浇水，放在有光的地方。"}, {"kind": "order", "prompt": "植物成长顺序。", "answer": ["种子", "小苗", "开花"], "options": ["开花", "种子", "小苗"], "tip": "先有种子。"}]},
+        {"id": "sci-body", "title": "我的身体", "icon": "🫁", "type": "science", "objective": "认识五官和健康习惯。", "cards": [{"big": "眼 耳 鼻 口 手", "title": "身体帮手", "image": "👀👂👃👄🖐️", "hint": "眼睛看，耳朵听，鼻子闻，嘴巴说和吃。", "say": "眼睛 耳朵 鼻子 嘴巴 手"}], "exercises": [{"kind": "choice", "prompt": "听声音主要用哪个部位？", "answer": "耳朵", "options": ["耳朵", "眼睛", "鼻子", "手"], "tip": "耳朵用来听。"}, {"kind": "judge", "prompt": "看书时眼睛离书太近是好习惯。", "answer": false, "tip": "看书要保持合适距离。"}]},
+        {"id": "sci-traffic", "title": "交通安全", "icon": "🚦", "type": "science", "objective": "认识红绿灯和过马路规则。", "cards": [{"big": "红灯停 绿灯行", "title": "红绿灯", "image": "🚦", "hint": "过马路要看信号灯，走斑马线。", "say": "红灯停，绿灯行"}], "exercises": [{"kind": "choice", "prompt": "过马路应该走哪里？", "answer": "斑马线", "options": ["斑马线", "马路中间", "花坛里", "车后面"], "tip": "斑马线是行人过街的地方。"}, {"kind": "judge", "prompt": "红灯亮时可以跑过去。", "answer": false, "tip": "红灯停。"}]},
+        {"id": "sci-safety", "title": "生活安全", "icon": "🛟", "type": "science", "objective": "知道电、火、热水、陌生人相关安全提醒。", "cards": [{"big": "安全第一", "title": "危险要远离", "image": "🔥🔌♨️", "hint": "插座、火、热水壶不能随便碰。", "say": "危险物品不乱碰"}], "exercises": [{"kind": "choice", "prompt": "看到热水壶冒热气，应该？", "answer": "请大人帮忙", "options": ["请大人帮忙", "马上摸一摸", "推倒看看", "放进书包"], "tip": "热水可能烫伤。"}, {"kind": "judge", "prompt": "陌生人给糖果并让你跟他走，可以答应。", "answer": false, "tip": "要找家长或老师。"}]},
+        {"id": "sci-nature", "title": "自然现象", "icon": "🌈", "type": "science", "objective": "认识影子、彩虹、雷电、雾。", "cards": [{"big": "影子 彩虹 雷电 雾", "title": "大自然的现象", "image": "🌈⚡🌫️", "hint": "自然现象可以观察，但雷电天气要待在安全地方。", "say": "影子 彩虹 雷电 雾"}], "exercises": [{"kind": "choice", "prompt": "雨后阳光出来，有时能看到？", "answer": "彩虹", "options": ["彩虹", "书包", "铅笔", "电梯"], "tip": "彩虹常在雨后出现。"}, {"kind": "judge", "prompt": "打雷时在大树下躲雨很安全。", "answer": false, "tip": "雷雨天远离大树。"}]}
+      ]
+    },
+    {
+      "id": "focus",
+      "title": "专注力训练",
+      "icon": "🎯",
+      "color": "#efe5ff",
+      "lessons": [
+        {"id": "focus-diff", "title": "找不同", "icon": "👀", "type": "focus", "objective": "观察一组图案，找出不一样的那个。", "cards": [{"big": "看仔细", "title": "找一个不同", "image": "😀😀😃😀", "hint": "从左到右、从上到下慢慢看。", "say": "找不同"}], "exercises": [{"kind": "spot", "prompt": "找出不同的表情。", "same": "😀", "different": "😃", "size": 16}]},
+        {"id": "focus-memory", "title": "视觉记忆", "icon": "🧠", "type": "focus", "objective": "先看图案，再从选项里找出刚才看到的顺序。", "cards": [{"big": "记一记", "title": "短时记忆", "image": "⭐🔵🍎", "hint": "可以在心里轻轻说一遍。", "say": "记住顺序"}], "exercises": [{"kind": "memory", "prompt": "记住这串图案。", "sequence": ["⭐", "🔵", "🍎"], "options": ["⭐ 🔵 🍎", "🔵 ⭐ 🍎", "⭐ 🍎 🔵", "🍎 🔵 ⭐"]}]},
+        {"id": "focus-color", "title": "颜色匹配", "icon": "🎨", "type": "focus", "objective": "观察颜色和文字是否对应。", "cards": [{"big": "红 蓝 黄 绿", "title": "颜色和注意", "image": "🔴🔵🟡🟢", "hint": "先看颜色，再看题目要求。", "say": "颜色匹配"}], "exercises": [{"kind": "choice", "prompt": "选出绿色。", "answer": "🟢", "options": ["🔴", "🟢", "🔵", "🟡"], "tip": "绿色像小草。"}, {"kind": "judge", "prompt": "🔵 是红色。", "answer": false, "tip": "蓝色是 blue，红色是 red。"}]},
+        {"id": "focus-digit", "title": "数字记忆", "icon": "🔢", "type": "focus", "objective": "记住短数字串，训练听觉和视觉记忆。", "cards": [{"big": "3 8 1", "title": "数字串", "image": "🔢", "hint": "分组记：38 和 1。", "say": "三 八 一"}], "exercises": [{"kind": "memory", "prompt": "记住这串数字。", "sequence": ["3", "8", "1", "6"], "options": ["3 8 1 6", "3 1 8 6", "8 3 1 6", "3 8 6 1"]}]},
+        {"id": "focus-shape", "title": "图形规律", "icon": "🔷", "type": "focus", "objective": "观察形状重复规律。", "cards": [{"big": "○ △ ○ △ ?", "title": "形状节奏", "image": "○△○△", "hint": "一组一组看。", "say": "圆 三角 圆 三角"}], "exercises": [{"kind": "choice", "prompt": "○ △ ○ △ 后面是？", "answer": "○", "options": ["○", "△", "□", "☆"], "tip": "圆和三角交替出现。"}]},
+        {"id": "focus-maze", "title": "简单迷宫", "icon": "🧭", "type": "focus", "objective": "沿着路从起点走到终点。", "cards": [{"big": "S -> G", "title": "走迷宫", "image": "🟩⬜⬜🏁", "hint": "每次只能走到相邻格子。", "say": "走到终点"}], "exercises": [{"kind": "maze", "prompt": "从 S 走到 G。", "grid": ["S..#", "##.#", "...G"], "path": [[0,0],[0,1],[0,2],[1,2],[2,2],[2,3]]}]},
+        {"id": "focus-shadow", "title": "影子配对", "icon": "🌗", "type": "focus", "objective": "观察轮廓，找出对应物品。", "cards": [{"big": "轮廓", "title": "看形状", "image": "🍎 ⚫", "hint": "先看整体外形，再看细节。", "say": "影子配对"}], "exercises": [{"kind": "match", "prompt": "物品和影子配对。", "pairs": [{"left": "🍎", "right": "圆圆带小柄"}, {"left": "⭐", "right": "五个尖角"}, {"left": "🔺", "right": "三个角"}]}]},
+        {"id": "focus-listen", "title": "听指令", "icon": "👂", "type": "focus", "objective": "按一句话里的条件做选择。", "cards": [{"big": "先听后选", "title": "听清条件", "image": "👂✅", "hint": "听到颜色、数量、位置，再行动。", "say": "请选出两个黄色星星"}], "exercises": [{"kind": "choice", "prompt": "选出“两个黄色星星”。", "answer": "🟡⭐ 🟡⭐", "options": ["🟡⭐ 🟡⭐", "🔵⭐ 🔵⭐", "🟡⭐", "🟡⭐ 🟡⭐ 🟡⭐"], "tip": "要黄色，也要两个。"}]}
+      ]
+    },
+    {
+      "id": "school",
+      "title": "入学准备",
+      "icon": "🎒",
+      "color": "#ffe8cc",
+      "lessons": [
+        {"id": "school-routine", "title": "早晨准备", "icon": "🌅", "type": "school", "objective": "练习起床、洗漱、吃早饭、整理书包的顺序。", "cards": [{"big": "起床 -> 洗漱 -> 早饭 -> 书包", "title": "早晨小流程", "image": "🛏️🪥🥣🎒", "hint": "按顺序做，早晨更从容。", "say": "起床，洗漱，吃早饭，整理书包"}], "exercises": [{"kind": "order", "prompt": "给早晨准备排顺序。", "answer": ["起床", "洗漱", "吃早饭", "整理书包"], "options": ["整理书包", "洗漱", "起床", "吃早饭"], "tip": "先起床，再做准备。"}]},
+        {"id": "school-bag", "title": "整理书包", "icon": "📚", "type": "school", "objective": "知道哪些物品该放进书包。", "cards": [{"big": "书 本 笔 水杯", "title": "书包清单", "image": "📘✏️🥤", "hint": "学习用品放书包，玩具按需要再带。", "say": "整理书包"}], "exercises": [{"kind": "classify", "prompt": "把物品分一分。", "groups": [{"name": "适合放书包", "items": ["📘", "✏️", "📏", "🥤"]}, {"name": "通常留在家", "items": ["🧸", "🎮", "🛼"]}]}]},
+        {"id": "school-class", "title": "课堂小规则", "icon": "🏫", "type": "school", "objective": "理解听讲、举手、轮流说话。", "cards": [{"big": "看 听 想 说", "title": "课堂四步", "image": "👀👂🤔✋", "hint": "眼睛看老师，耳朵听清楚，想好了再举手。", "say": "认真听讲，举手发言"}], "exercises": [{"kind": "choice", "prompt": "想回答问题时，可以先做什么？", "answer": "举手", "options": ["举手", "大喊", "离开座位", "拍桌子"], "tip": "举手能提醒老师。"}, {"kind": "judge", "prompt": "别人发言时，我们可以认真听。", "answer": true, "tip": "轮流说话，互相尊重。"}]},
+        {"id": "school-help", "title": "需要帮助怎么说", "icon": "🙋", "type": "school", "objective": "练习清楚表达自己的需要。", "cards": [{"big": "老师，请帮帮我。", "title": "礼貌求助", "image": "🙋‍♀️", "hint": "先叫人，再说遇到什么问题。", "say": "老师，请帮帮我"}], "exercises": [{"kind": "choice", "prompt": "铅笔断了，可以怎么说？", "answer": "老师，我的铅笔断了，请帮我削一下。", "options": ["老师，我的铅笔断了，请帮我削一下。", "我不说话。", "把铅笔扔掉。", "大声哭喊。"], "tip": "把问题说清楚。"}, {"kind": "speak", "prompt": "说一说：如果找不到水杯，你会怎么求助？"}]},
+        {"id": "school-friends", "title": "和同伴相处", "icon": "🤝", "type": "school", "objective": "练习分享、等待、表达不同意见。", "cards": [{"big": "请 谢谢 没关系", "title": "友好用语", "image": "🤝", "hint": "想借东西先说请，得到帮助说谢谢。", "say": "请，谢谢，没关系"}], "exercises": [{"kind": "choice", "prompt": "想借同学的橡皮，可以说？", "answer": "请问我可以借一下橡皮吗？", "options": ["请问我可以借一下橡皮吗？", "直接拿走", "藏起来", "扔到地上"], "tip": "先询问，对方同意后再用。"}, {"kind": "judge", "prompt": "排队时轮到别人先来，我们可以等一等。", "answer": true, "tip": "等待是很重要的规则。"}]},
+        {"id": "school-toilet", "title": "如厕和喝水", "icon": "🚰", "type": "school", "objective": "知道有需要要及时告诉老师，并注意卫生。", "cards": [{"big": "我想去洗手间。", "title": "表达身体需要", "image": "🚰🧼", "hint": "有需要可以礼貌告诉老师，不憋着。", "say": "老师，我想去洗手间"}], "exercises": [{"kind": "choice", "prompt": "上完洗手间后要做什么？", "answer": "洗手", "options": ["洗手", "乱跑", "不冲水", "玩水"], "tip": "洗手能保持卫生。"}, {"kind": "speak", "prompt": "练习说：老师，我想喝水。"}]},
+        {"id": "school-emotion", "title": "认识心情", "icon": "😊", "type": "school", "objective": "认识开心、紧张、生气、难过，并学会表达。", "cards": [{"big": "开心 紧张 生气 难过", "title": "心情词", "image": "😊😟😠😢", "hint": "心情都可以说出来，慢慢解决。", "say": "我有一点紧张"}], "exercises": [{"kind": "choice", "prompt": "第一天上学有点担心，可以说？", "answer": "我有点紧张。", "options": ["我有点紧张。", "我永远不说。", "我要推别人。", "我乱扔东西。"], "tip": "说出心情，大人会帮助你。"}, {"kind": "match", "prompt": "表情和心情配对。", "pairs": [{"left": "😊", "right": "开心"}, {"left": "😟", "right": "紧张"}, {"left": "😢", "right": "难过"}]}]},
+        {"id": "school-after", "title": "放学等待", "icon": "🚸", "type": "school", "objective": "知道放学后在指定地点等待家长或老师。", "cards": [{"big": "不乱跑 不跟陌生人走", "title": "放学安全", "image": "🚸👨‍👩‍👧", "hint": "没有看到家长时，找老师帮忙。", "say": "我在指定地点等家长"}], "exercises": [{"kind": "choice", "prompt": "放学没看到家长，应该？", "answer": "找老师帮忙", "options": ["找老师帮忙", "自己跑出校门", "跟陌生人走", "躲起来"], "tip": "老师可以帮你联系家长。"}, {"kind": "judge", "prompt": "不认识的人说带你找妈妈，可以直接跟他走。", "answer": false, "tip": "要先找老师或熟悉的家长。"}]}
+      ]
+    },
+    {
+      "id": "results",
+      "title": "学习成果",
+      "icon": "📈",
+      "color": "#f5f0ff",
+      "type": "results",
+      "lessons": []
+    }
+  ]
+}
+  </script>
+  <script>
+  (function(){
+    "use strict";
+    var K_CONTENT = "bridgeDesk.content.v1";
+    var K_PROGRESS = "bridgeDesk.progress.v1";
+    var encouragement = ["你发现啦！","很棒，再试一题！","答对了，继续观察！","做得好，慢慢来！"];
+    var gentle = ["再看一看，差一点点。","没关系，换个角度想想。","再试一次，你可以慢慢选。"];
+    var state = {
+      content:null, progress:null, sectionId:null, lessonId:null, cardIndex:0,
+      answers:{}, order:{}, classify:{}, match:{}, memory:{}, spot:{}, maze:{},
+      editor:{open:false, path:["sections",0]}
+    };
+
+    function $(sel, root){ return (root || document).querySelector(sel); }
+    function $all(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+    function clone(x){ return JSON.parse(JSON.stringify(x)); }
+    function shuffle(arr){
+      var a = arr.slice();
+      for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+      return a;
+    }
+    function pct(a,b){ return b ? Math.round(a/b*100) : 0; }
+    function esc(s){
+      return String(s == null ? "" : s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});
+    }
+    function pathKey(sectionId, lessonId){ return sectionId + "::" + lessonId; }
+    function nowText(){
+      var d = new Date();
+      return (d.getMonth()+1) + "月" + d.getDate() + "日 " + String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+    }
+    function defaultContent(){
+      return JSON.parse($("#default-content").textContent);
+    }
+    async function loadContent(){
+      var saved = localStorage.getItem(K_CONTENT);
+      if(saved){
+        try { return JSON.parse(saved); } catch(e) { localStorage.removeItem(K_CONTENT); }
+      }
+      var data = null;
+      try {
+        var res = await fetch("content.json", {cache:"no-store"});
+        if(res.ok) data = await res.json();
+      } catch(e) {}
+      if(!data) data = defaultContent();
+      localStorage.setItem(K_CONTENT, JSON.stringify(data));
+      return data;
+    }
+    function loadProgress(){
+      try { return JSON.parse(localStorage.getItem(K_PROGRESS)) || {lessons:{},recent:[]}; }
+      catch(e){ return {lessons:{},recent:[]}; }
+    }
+    function saveContent(){ localStorage.setItem(K_CONTENT, JSON.stringify(state.content)); }
+    function saveProgress(){ localStorage.setItem(K_PROGRESS, JSON.stringify(state.progress)); }
+    function allSections(){
+      var sections = state.content.sections || [];
+      if(sections.some(function(s){ return s.id === "results"; })) return sections;
+      return sections.concat([{id:"results",title:"学习成果",icon:"📈",color:"#f5f0ff",lessons:[],virtual:true}]);
+    }
+    function getSection(){
+      return allSections().find(function(s){return s.id===state.sectionId;}) || allSections()[0];
+    }
+    function getLesson(section){
+      if(!section || section.virtual) return null;
+      return section.lessons.find(function(l){return l.id===state.lessonId;}) || section.lessons[0];
+    }
+    function sectionStats(section){
+      if(section.virtual) return {done:0,total:1,attempts:0,correct:0};
+      var done = 0, attempts = 0, correct = 0;
+      section.lessons.forEach(function(l){
+        var p = state.progress.lessons[pathKey(section.id,l.id)];
+        if(p && (p.views || p.correct)) done++;
+        if(p){ attempts += p.attempts || 0; correct += p.correct || 0; }
+      });
+      return {done:done,total:Math.max(1,section.lessons.length),attempts:attempts,correct:correct};
+    }
+    function markViewed(section, lesson){
+      if(!section || !lesson || section.virtual) return;
+      var key = pathKey(section.id, lesson.id);
+      var p = state.progress.lessons[key] || {views:0,attempts:0,correct:0,known:[]};
+      if(!p.known) p.known = [];
+      p.views = (p.views || 0) + 1;
+      if(p.known.indexOf(lesson.title) < 0) p.known.push(lesson.title);
+      state.progress.lessons[key] = p;
+      saveProgress();
+    }
+    function record(section, lesson, ok, label){
+      if(!section || !lesson || section.virtual) return;
+      var key = pathKey(section.id, lesson.id);
+      var p = state.progress.lessons[key] || {views:0,attempts:0,correct:0,known:[]};
+      p.attempts = (p.attempts || 0) + 1;
+      if(ok) p.correct = (p.correct || 0) + 1;
+      if(!p.known) p.known = [];
+      if(p.known.indexOf(lesson.title) < 0) p.known.push(lesson.title);
+      state.progress.lessons[key] = p;
+      state.progress.recent = state.progress.recent || [];
+      state.progress.recent.unshift({time:nowText(), section:section.title, lesson:lesson.title, label:label || "练习", ok:!!ok});
+      state.progress.recent = state.progress.recent.slice(0,30);
+      saveProgress();
+      renderNav();
+    }
+    function speak(text, type){
+      var box = $("#voiceNote");
+      if(!("speechSynthesis" in window)){
+        if(box) box.textContent = "此浏览器没有离线朗读功能，请家长读一读。";
+        return;
+      }
+      var u = new SpeechSynthesisUtterance(String(text || ""));
+      u.lang = type === "english" ? "en-US" : "zh-CN";
+      u.rate = type === "english" ? 0.82 : 0.85;
+      u.pitch = 1.08;
+      var voices = speechSynthesis.getVoices();
+      var matched = voices.find(function(v){ return v.lang && v.lang.toLowerCase().indexOf(u.lang.toLowerCase().slice(0,2)) === 0; });
+      if(matched) u.voice = matched;
+      if(box && !matched) box.textContent = "如果没有听到声音，请家长读一读。";
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+    function render(){
+      var app = $("#app");
+      app.innerHTML = '<aside class="side"><div id="navHeader"></div><div id="navList" class="nav-list"></div></aside><main id="main" class="main"></main>';
+      renderNav();
+      renderMain();
+    }
+    function renderNav(){
+      var sections = allSections();
+      var current = getSection();
+      var stats = sectionStats(current);
+      $("#navHeader").innerHTML =
+        '<div class="kid-card">' +
+          '<div class="kid-row"><div class="avatar">🌱</div><div><input id="kidName" class="kid-name" value="' + esc(state.content.childName || "小朋友") + '" aria-label="孩子昵称"><div class="small">当前主题：' + esc(current.title) + '</div></div></div>' +
+          '<div class="small">本主题进度 ' + stats.done + '/' + stats.total + ' · 正确率 ' + pct(stats.correct, stats.attempts) + '%</div>' +
+          '<div class="progress-bar"><div class="progress-fill" style="width:' + pct(stats.done,stats.total) + '%"></div></div>' +
+        '</div>';
+      $("#navList").innerHTML = sections.map(function(s){
+        var st = sectionStats(s);
+        return '<button class="nav-btn ' + (s.id===state.sectionId?'active':'') + '" data-nav="' + esc(s.id) + '">' +
+          '<span class="nav-icon">' + esc(s.icon) + '</span><span>' + esc(s.title) + '<span class="nav-meta">' + ((s.virtual || s.id === "results") ? "查看记录" : (st.done + "/" + st.total + " 已学")) + '</span></span></button>';
+      }).join("");
+      $("#kidName").addEventListener("input", function(e){ state.content.childName = e.target.value || "小朋友"; saveContent(); });
+      $all("[data-nav]").forEach(function(btn){
+        btn.addEventListener("click", function(){
+          state.sectionId = btn.getAttribute("data-nav");
+          var sec = getSection();
+          state.lessonId = sec.lessons && sec.lessons[0] ? sec.lessons[0].id : null;
+          state.cardIndex = 0;
+          state.answers = {}; state.order = {}; state.classify = {}; state.match = {}; state.memory = {}; state.spot = {}; state.maze = {};
+          render();
+        });
+      });
+    }
+    function renderMain(){
+      var section = getSection();
+      if(section.virtual || section.id === "results"){ renderResults(); return; }
+      var lesson = getLesson(section);
+      if(!lesson) return;
+      state.lessonId = lesson.id;
+      markViewed(section, lesson);
+      var stats = sectionStats(section);
+      $("#main").innerHTML =
+        '<div class="topline"><div class="section-title"><h1>' + esc(section.icon) + ' ' + esc(section.title) + '</h1><p>' + esc(lesson.objective || "") + '</p></div>' +
+        '<div class="pill">正确率 ' + pct(stats.correct,stats.attempts) + '%</div></div>' +
+        '<div class="lesson-strip">' + section.lessons.map(function(l){return '<button class="lesson-tab ' + (l.id===lesson.id?'active':'') + '" data-lesson="' + esc(l.id) + '">' + esc(l.icon || "•") + ' ' + esc(l.title) + '</button>';}).join("") + '</div>' +
+        '<div class="workbench"><section id="learnPanel" class="panel"></section><section id="practicePanel" class="panel"></section></div>';
+      $all("[data-lesson]").forEach(function(btn){
+        btn.addEventListener("click", function(){
+          state.lessonId = btn.getAttribute("data-lesson");
+          state.cardIndex = 0;
+          state.answers = {}; state.order = {}; state.classify = {}; state.match = {}; state.memory = {}; state.spot = {}; state.maze = {};
+          renderMain(); renderNav();
+        });
+      });
+      renderLearn(section, lesson);
+      renderPractice(section, lesson);
+    }
+    function renderLearn(section, lesson){
+      var cards = lesson.cards || [];
+      var card = cards[state.cardIndex] || {big:lesson.title,title:lesson.title,hint:lesson.objective,image:lesson.icon};
+      $("#learnPanel").innerHTML =
+        '<div class="card-stage">' +
+          '<div class="card-image">' + esc(card.image || lesson.icon || section.icon) + '</div>' +
+          '<div class="big-card">' + esc(card.big || card.title || lesson.title) + '</div>' +
+          '<div class="card-title">' + esc(card.title || lesson.title) + '</div>' +
+          (card.story ? '<div class="story">' + esc(card.story) + '</div>' : '') +
+          (card.hint ? '<div class="hint">提示：' + esc(card.hint) + '</div>' : '') +
+          (card.mouth ? '<div class="hint">口型：' + esc(card.mouth) + '</div>' : '') +
+          (card.steps ? '<div class="steps">' + card.steps.map(function(s){return '<span class="step">' + esc(s) + '</span>';}).join("") + '</div>' : '') +
+          '<div id="voiceNote" class="small"></div>' +
+          '<div class="card-actions">' +
+            '<button class="soft" id="prevCard">← 上一张</button>' +
+            '<button class="primary" id="speakCard">🔊 读一读</button>' +
+            '<button class="soft" id="nextCard">下一张 →</button>' +
+          '</div>' +
+          '<div class="card-actions"><button id="resetLesson" class="warn">重新学习本主题</button></div>' +
+        '</div>';
+      $("#prevCard").disabled = state.cardIndex <= 0;
+      $("#nextCard").disabled = state.cardIndex >= cards.length - 1;
+      $("#prevCard").onclick = function(){ state.cardIndex = Math.max(0,state.cardIndex-1); renderLearn(section, lesson); };
+      $("#nextCard").onclick = function(){ state.cardIndex = Math.min(cards.length-1,state.cardIndex+1); renderLearn(section, lesson); };
+      $("#speakCard").onclick = function(){ speak(card.say || card.big || card.title || lesson.title, lesson.type); };
+      $("#resetLesson").onclick = function(){
+        delete state.progress.lessons[pathKey(section.id,lesson.id)];
+        saveProgress();
+        state.answers = {}; state.order = {}; state.classify = {}; state.match = {}; state.memory = {}; state.spot = {}; state.maze = {};
+        render();
+      };
+    }
+    function generatedExercises(lesson){
+      var g = lesson.generator;
+      var id = lesson.id;
+      if(!state.answers[id + ":batch"]) state.answers[id + ":batch"] = Math.random().toString(36).slice(2);
+      var out = [];
+      for(var i=0;i<5;i++){
+        if(g.kind === "count" || g.kind === "quantity"){
+          var n = rand(g.min,g.max), item = (g.items || ["⭐"])[rand(0,(g.items||["⭐"]).length-1)];
+          out.push({kind:"choice", prompt:"数一数： " + repeat(item,n), answer:String(n), options:numberOptions(n,g.min,g.max), tip:"一个一个点着数。"});
+        } else if(g.kind === "number"){
+          var x = rand(g.min,g.max);
+          out.push({kind:"choice", prompt:"这个数字怎么读？ " + x, answer:cnNum(x), options:shuffle([cnNum(x),cnNum((x+1)%21),cnNum(Math.max(0,x-1)),cnNum(rand(g.min,g.max))]).slice(0,4), tip:"看清十位和个位。"});
+        } else if(g.kind === "compare"){
+          var a = rand(g.min,g.max), b = rand(g.min,g.max);
+          var ans = a>b ? ">" : (a<b ? "<" : "=");
+          out.push({kind:"choice", prompt:"比较大小： " + a + "  ?  " + b, answer:ans, options:[">","<","="], tip:"开口朝向大的数。"});
+        } else if(g.kind === "addsub"){
+          var add = Math.random() > .45, m = rand(1,g.max), n = rand(1,g.max);
+          if(add && m+n>20) n = 20-m;
+          if(!add && n>m){ var t=m; m=n; n=t; }
+          var r = add ? m+n : m-n;
+          out.push({kind:"choice", prompt:m + (add ? " + " : " - ") + n + " = ?", answer:String(r), options:numberOptions(r,0,20), tip:add ? "合起来，用加法。" : "拿走一些，用减法。"});
+        } else if(g.kind === "pattern"){
+          var patterns = [["🔴","🔵"],["⭐","🌙"],["△","□","○"],["🍎","🍌","🍌"]];
+          var p = patterns[rand(0,patterns.length-1)];
+          var seq = [];
+          for(var k=0;k<5;k++) seq.push(p[k % p.length]);
+          var answer = p[5 % p.length];
+          out.push({kind:"choice", prompt:"找规律：" + seq.join(" ") + " ?", answer:answer, options:shuffle([answer].concat(["🔴","🔵","⭐","🌙","△","□","○","🍎","🍌"].filter(function(v){return v!==answer;}))).slice(0,4), tip:"找到重复的一组。"});
+        }
+      }
+      return out;
+    }
+    function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+    function repeat(s,n){ var r=[]; for(var i=0;i<n;i++) r.push(s); return r.join(" "); }
+    function numberOptions(ans,min,max){
+      var set = {};
+      set[String(ans)] = true;
+      while(Object.keys(set).length < 4) set[String(rand(min,max))] = true;
+      return shuffle(Object.keys(set));
+    }
+    function cnNum(n){
+      var a=["零","一","二","三","四","五","六","七","八","九","十","十一","十二","十三","十四","十五","十六","十七","十八","十九","二十"];
+      return a[n] || String(n);
+    }
+    function renderPractice(section, lesson){
+      var list = lesson.generator ? generatedExercises(lesson) : (lesson.exercises || []);
+      $("#practicePanel").innerHTML =
+        '<div class="topline"><div><h2 style="margin:0 0 4px;font-size:24px">练一练</h2><div class="small">答错可以再试，没有扣分。</div></div>' +
+        (lesson.generator ? '<button id="newBatch" class="primary">🔄 换一批新题</button>' : '') + '</div>' +
+        '<div class="exercise-list">' + list.map(function(ex,i){ return renderExercise(ex,i,section,lesson); }).join("") + '</div>';
+      if($("#newBatch")) $("#newBatch").onclick = function(){ state.answers[lesson.id + ":batch"] = Math.random().toString(36).slice(2); state.answers = {}; renderPractice(section, lesson); };
+      bindExercises(section, lesson, list);
+    }
+    function renderExercise(ex,i,section,lesson){
+      var id = exId(lesson,i);
+      var fb = state.answers[id] ? '<div class="feedback ' + (state.answers[id].ok?'ok':'no') + '">' + esc(state.answers[id].msg) + '</div>' : "";
+      if(ex.kind === "choice" || ex.kind === "judge"){
+        var opts = ex.kind === "judge" ? [{v:true,t:"对"}, {v:false,t:"不对"}] : shuffle(ex.options || []);
+        return '<div class="exercise" data-ex="' + i + '"><h3>' + esc(ex.prompt) + '</h3><div class="choice-grid">' +
+          opts.map(function(o){ var val = typeof o === "object" ? o.v : o; var txt = typeof o === "object" ? o.t : o; return '<button data-choice="' + esc(String(val)) + '">' + esc(txt) + '</button>'; }).join("") +
+          '</div>' + fb + '</div>';
+      }
+      if(ex.kind === "match"){
+        return '<div class="exercise" data-ex="' + i + '"><h3>' + esc(ex.prompt) + '</h3>' +
+          (ex.pairs||[]).map(function(p,pi){
+            var opts = shuffle((ex.pairs||[]).map(function(x){return x.right;}));
+            var mid = id + ":m:" + pi;
+            var f = state.match[mid];
+            return '<div class="match-row"><div class="left-token">' + esc(p.left) + '</div><div class="choice-grid">' + opts.map(function(o){return '<button data-match="' + pi + '" data-choice="' + esc(o) + '">' + esc(o) + '</button>';}).join("") + '</div></div>' +
+            (f ? '<div class="feedback ' + (f.ok?'ok':'no') + '">' + esc(f.msg) + '</div>' : '');
+          }).join("") + '</div>';
+      }
+      if(ex.kind === "order"){
+        var picked = state.order[id] || [];
+        var remain = (ex.options||[]).filter(function(x){return picked.indexOf(x)<0;});
+        return '<div class="exercise" data-ex="' + i + '"><h3>' + esc(ex.prompt) + '</h3>' +
+          '<div class="small">已选顺序：</div><div class="order-pick">' + (picked.length?picked.map(function(x){return '<span class="token">' + esc(x) + '</span>';}).join(""):'<span class="small">还没有选择</span>') + '</div>' +
+          '<div class="choice-grid">' + remain.map(function(o){return '<button data-order-add="' + esc(o) + '">' + esc(o) + '</button>';}).join("") + '</div>' +
+          '<div class="card-actions"><button data-order-clear>重选</button><button class="primary" data-order-check>检查</button></div>' + fb + '</div>';
+      }
+      if(ex.kind === "classify"){
+        var items = [];
+        (ex.groups||[]).forEach(function(g){ (g.items||[]).forEach(function(it){ items.push({it:it,g:g.name}); }); });
+        items = shuffle(items);
+        return '<div class="exercise" data-ex="' + i + '"><h3>' + esc(ex.prompt) + '</h3>' +
+          items.map(function(item,idx){
+            var cid = id + ":c:" + idx;
+            return '<div class="match-row"><div class="left-token">' + esc(item.it) + '</div><div class="choice-grid">' + (ex.groups||[]).map(function(g){return '<button data-classify-item="' + idx + '" data-correct="' + esc(item.g) + '" data-choice="' + esc(g.name) + '">' + esc(g.name) + '</button>';}).join("") + '</div></div>' +
+            (state.classify[cid] ? '<div class="feedback ' + (state.classify[cid].ok?'ok':'no') + '">' + esc(state.classify[cid].msg) + '</div>' : '');
+          }).join("") + '</div>';
+      }
+      if(ex.kind === "speak"){
+        return '<div class="exercise" data-ex="' + i + '"><h3>' + esc(ex.prompt) + '</h3><button class="primary" data-said>我说完了</button>' + fb + '</div>';
+      }
+      if(ex.kind === "spot"){
+        if(state.spot[id] == null) state.spot[id] = rand(0,(ex.size||16)-1);
+        var cells = [];
+        for(var s=0;s<(ex.size||16);s++) cells.push('<button data-spot="' + s + '">' + esc(s===state.spot[id] ? ex.different : ex.same) + '</button>');
+        return '<div class="exercise" data-ex="' + i + '"><h3>' + esc(ex.prompt) + '</h3><div class="spot-grid" style="grid-template-columns:repeat(4,48px)">' + cells.join("") + '</div>' + fb + '</div>';
+      }
+      if(ex.kind === "memory"){
+        var show = state.memory[id] && state.memory[id].show;
+        var seq = (ex.sequence||[]).join(" ");
+        return '<div class="exercise" data-ex="' + i + '"><h3>' + esc(ex.prompt) + '</h3>' +
+          '<div class="memory-box">' + esc(show ? seq : "已盖住") + '</div>' +
+          '<div class="card-actions"><button data-memory-show>' + (show ? "盖住" : "开始记忆") + '</button></div>' +
+          '<div class="choice-grid">' + shuffle(ex.options||[]).map(function(o){return '<button data-choice="' + esc(o) + '">' + esc(o) + '</button>';}).join("") + '</div>' + fb + '</div>';
+      }
+      if(ex.kind === "maze"){
+        var rows = ex.grid || [];
+        var done = state.maze[id] || 0;
+        var cellsHtml = "";
+        rows.forEach(function(row,r){
+          row.split("").forEach(function(ch,c){
+            var wall = ch === "#";
+            var stepIndex = (ex.path||[]).findIndex(function(p){return p[0]===r && p[1]===c;});
+            var cls = wall ? "wall" : (stepIndex >=0 && stepIndex < done ? "done" : "onpath");
+            var label = ch === "." ? "" : ch;
+            cellsHtml += '<button class="' + cls + '" data-maze-r="' + r + '" data-maze-c="' + c + '"' + (wall?' disabled':'') + '>' + esc(label) + '</button>';
+          });
+        });
+        return '<div class="exercise" data-ex="' + i + '"><h3>' + esc(ex.prompt) + '</h3><div class="maze-grid" style="grid-template-columns:repeat(' + (rows[0]?rows[0].length:4) + ',48px)">' + cellsHtml + '</div>' + fb + '</div>';
+      }
+      return '<div class="exercise"><h3>' + esc(ex.prompt || "练习") + '</h3></div>';
+    }
+    function exId(lesson,i){ return lesson.id + ":" + i; }
+    function setFeedback(id, ok, tip){
+      state.answers[id] = {ok:ok, msg:(ok ? encouragement[rand(0,encouragement.length-1)] : gentle[rand(0,gentle.length-1)] + (tip ? " " + tip : ""))};
+    }
+    function bindExercises(section, lesson, list){
+      $all(".exercise").forEach(function(box){
+        var i = Number(box.getAttribute("data-ex"));
+        var ex = list[i], id = exId(lesson,i);
+        $all("[data-choice]", box).forEach(function(btn){
+          btn.addEventListener("click", function(){
+            var val = btn.getAttribute("data-choice");
+            var ans = ex.kind === "judge" ? String(ex.answer) : String(ex.answer || (ex.sequence||[]).join(" "));
+            var ok = val === ans;
+            setFeedback(id, ok, ex.tip);
+            record(section, lesson, ok, ex.prompt);
+            renderPractice(section, lesson);
+          });
+        });
+        $all("[data-match]", box).forEach(function(btn){
+          btn.addEventListener("click", function(){
+            var pi = Number(btn.getAttribute("data-match"));
+            var ok = btn.getAttribute("data-choice") === String(ex.pairs[pi].right);
+            state.match[id + ":m:" + pi] = {ok:ok,msg:ok?encouragement[rand(0,encouragement.length-1)]:(gentle[rand(0,gentle.length-1)])};
+            record(section, lesson, ok, ex.prompt);
+            renderPractice(section, lesson);
+          });
+        });
+        $all("[data-order-add]", box).forEach(function(btn){
+          btn.onclick = function(){ state.order[id] = state.order[id] || []; state.order[id].push(btn.getAttribute("data-order-add")); renderPractice(section, lesson); };
+        });
+        var clear = $("[data-order-clear]", box);
+        if(clear) clear.onclick = function(){ state.order[id] = []; renderPractice(section, lesson); };
+        var check = $("[data-order-check]", box);
+        if(check) check.onclick = function(){
+          var picked = state.order[id] || [];
+          var ok = JSON.stringify(picked) === JSON.stringify(ex.answer || []);
+          setFeedback(id, ok, ex.tip);
+          record(section, lesson, ok, ex.prompt);
+          renderPractice(section, lesson);
+        };
+        $all("[data-classify-item]", box).forEach(function(btn){
+          btn.onclick = function(){
+            var idx = btn.getAttribute("data-classify-item");
+            var ok = btn.getAttribute("data-choice") === btn.getAttribute("data-correct");
+            state.classify[id + ":c:" + idx] = {ok:ok,msg:ok?encouragement[rand(0,encouragement.length-1)]:(gentle[rand(0,gentle.length-1)])};
+            record(section, lesson, ok, ex.prompt);
+            renderPractice(section, lesson);
+          };
+        });
+        var said = $("[data-said]", box);
+        if(said) said.onclick = function(){ setFeedback(id,true,""); record(section, lesson, true, ex.prompt); renderPractice(section, lesson); };
+        $all("[data-spot]", box).forEach(function(btn){
+          btn.onclick = function(){
+            var ok = Number(btn.getAttribute("data-spot")) === state.spot[id];
+            setFeedback(id, ok, ex.tip);
+            record(section, lesson, ok, ex.prompt);
+            if(ok) state.spot[id] = null;
+            renderPractice(section, lesson);
+          };
+        });
+        var mem = $("[data-memory-show]", box);
+        if(mem) mem.onclick = function(){
+          state.memory[id] = state.memory[id] || {};
+          state.memory[id].show = !state.memory[id].show;
+          renderPractice(section, lesson);
+        };
+        $all("[data-maze-r]", box).forEach(function(btn){
+          btn.onclick = function(){
+            var r = Number(btn.getAttribute("data-maze-r")), c = Number(btn.getAttribute("data-maze-c"));
+            var step = state.maze[id] || 0;
+            var next = (ex.path||[])[step];
+            var ok = next && next[0]===r && next[1]===c;
+            if(ok){
+              state.maze[id] = step + 1;
+              if(state.maze[id] >= (ex.path||[]).length){ setFeedback(id,true,""); record(section, lesson, true, ex.prompt); }
+            } else { setFeedback(id,false,"每次走相邻的正确小格。"); record(section, lesson, false, ex.prompt); }
+            renderPractice(section, lesson);
+          };
+        });
+      });
+    }
+    function renderResults(){
+      var sections = state.content.sections;
+      var totalAttempts = 0, totalCorrect = 0, learned = 0;
+      var cards = sections.map(function(s){
+        var st = sectionStats(s);
+        totalAttempts += st.attempts; totalCorrect += st.correct; learned += st.done;
+        return '<div class="result-card"><h3>' + esc(s.icon) + ' ' + esc(s.title) + '</h3><div class="small">完成度 ' + st.done + '/' + st.total + '</div><div class="progress-bar"><div class="progress-fill" style="width:' + pct(st.done,st.total) + '%"></div></div><div class="small">练习 ' + st.attempts + ' 次 · 正确率 ' + pct(st.correct,st.attempts) + '%</div></div>';
+      }).join("");
+      var known = [];
+      Object.keys(state.progress.lessons || {}).forEach(function(k){ (state.progress.lessons[k].known || []).forEach(function(x){ if(known.indexOf(x)<0) known.push(x); }); });
+      $("#main").innerHTML =
+        '<div class="topline"><div class="section-title"><h1>📈 学习成果</h1><p>' + esc(state.content.childName || "小朋友") + ' 已学习 ' + learned + ' 个主题，整体正确率 ' + pct(totalCorrect,totalAttempts) + '%。继续按自己的节奏来。</p></div><div class="pill">最近记录自动保存</div></div>' +
+        '<div class="results-grid">' + cards + '</div>' +
+        '<section class="panel" style="margin-top:14px"><h2 style="margin-top:0">已掌握内容</h2><div class="token-row">' + (known.length ? known.map(function(k){return '<span class="token">' + esc(k) + '</span>';}).join("") : '<span class="small">还没有记录，先去学习一个主题吧。</span>') + '</div></section>' +
+        '<section class="panel" style="margin-top:14px"><h2 style="margin-top:0">最近记录</h2><div class="recent">' + ((state.progress.recent||[]).slice(0,12).map(function(r){return '<div class="recent-item"><span>' + esc(r.time + " · " + r.section + " · " + r.lesson) + '</span><strong>' + (r.ok ? "答对" : "再试") + '</strong></div>';}).join("") || '<div class="small">暂无记录。</div>') + '</div></section>';
+    }
+    function openEditor(){
+      state.editor.open = true;
+      renderEditor();
+    }
+    function closeEditor(){ state.editor.open = false; $("#editorModal").classList.remove("open"); $("#editorModal").setAttribute("aria-hidden","true"); render(); }
+    function getByPath(path){
+      var obj = state.content;
+      path.forEach(function(p){ obj = obj[p]; });
+      return obj;
+    }
+    function setByPath(path,val){
+      var obj = state.content;
+      for(var i=0;i<path.length-1;i++) obj = obj[path[i]];
+      obj[path[path.length-1]] = val;
+      saveContent();
+    }
+    function renderEditor(){
+      var modal = $("#editorModal");
+      modal.classList.add("open"); modal.setAttribute("aria-hidden","false");
+      modal.innerHTML = '<div class="editor"><aside class="editor-side"><div class="editor-toolbar"><button id="closeEditor">关闭</button><button id="addSection" class="primary">新增板块</button></div><div id="tree"></div></aside><main class="editor-main"><div class="editor-toolbar"><button id="exportJson" class="primary">导出 content.json</button><button id="importJson">导入</button><button id="restoreDefault" class="warn">恢复默认</button><input id="fileImport" class="file-input" type="file" accept="application/json"></div><div id="form"></div></main></div>';
+      $("#closeEditor").onclick = closeEditor;
+      $("#addSection").onclick = function(){ state.content.sections.push(newSection()); saveContent(); state.editor.path=["sections",state.content.sections.length-1]; renderEditor(); };
+      $("#exportJson").onclick = exportJson;
+      $("#importJson").onclick = function(){ $("#fileImport").click(); };
+      $("#fileImport").onchange = importJson;
+      $("#restoreDefault").onclick = function(){ if(confirm("恢复默认内容会覆盖家长编辑内容，继续吗？")){ state.content = defaultContent(); saveContent(); state.editor.path=["sections",0]; renderEditor(); render(); } };
+      renderTree(); renderForm();
+    }
+    function renderTree(){
+      $("#tree").innerHTML = state.content.sections.map(function(s,si){
+        var activeS = JSON.stringify(state.editor.path) === JSON.stringify(["sections",si]);
+        return '<button class="tree-btn ' + (activeS?'active':'') + '" data-epath="sections,' + si + '">' + esc(s.icon || "📁") + ' ' + esc(s.title) + '</button>' +
+          (s.lessons||[]).map(function(l,li){
+            var p = "sections," + si + ",lessons," + li;
+            var active = JSON.stringify(state.editor.path) === JSON.stringify(["sections",si,"lessons",li]);
+            return '<button class="tree-btn lesson ' + (active?'active':'') + '" data-epath="' + p + '">• ' + esc(l.title) + '</button>';
+          }).join("");
+      }).join("");
+      $all("[data-epath]").forEach(function(btn){ btn.onclick = function(){ state.editor.path = btn.getAttribute("data-epath").split(",").map(function(x){return /^\d+$/.test(x)?Number(x):x;}); renderEditor(); }; });
+    }
+    var labels = {version:"版本", childName:"孩子昵称", theme:"当前学习主题", sections:"板块", id:"标识", title:"名称", icon:"图标", color:"颜色", lessons:"子项", type:"类型", objective:"学习目标", cards:"学习卡片", big:"大字卡", image:"配图/Emoji", hint:"发音或联想提示", mouth:"口型提示", say:"朗读文本", steps:"笔顺/步骤", story:"故事正文", exercises:"练习题", kind:"题型", prompt:"问题", answer:"答案", options:"选项", tip:"提示", pairs:"配对", left:"左侧", right:"右侧", groups:"分类组", name:"类别名", items:"项目", generator:"随机出题器", min:"最小值", max:"最大值", same:"相同项", different:"不同项", size:"格子数", sequence:"记忆序列", grid:"迷宫地图", path:"正确路径"};
+    function label(k){ return labels[k] || k; }
+    function renderForm(){
+      var obj = getByPath(state.editor.path);
+      $("#form").innerHTML = '<h2 style="margin-top:0">编辑：' + esc(obj.title || obj.id || "内容") + '</h2>' + fieldHtml(obj,state.editor.path,"root");
+      bindForm($("#form"));
+    }
+    function fieldHtml(val,path,key){
+      if(Array.isArray(val)){
+        return '<div class="array-box"><div class="array-head"><strong>' + esc(label(key)) + '</strong><button class="mini primary" data-add="' + esc(path.join(",")) + '" data-key="' + esc(key) + '">添加</button></div>' +
+          val.map(function(item,i){
+            var p = path.concat([i]);
+            if(item && typeof item === "object"){
+              return '<div class="item-card"><div class="item-actions"><button class="mini" data-up="' + esc(p.join(",")) + '">↑</button><button class="mini" data-down="' + esc(p.join(",")) + '">↓</button><button class="mini warn" data-del="' + esc(p.join(",")) + '">删除</button></div>' + fieldHtml(item,p,key + i) + '</div>';
+            }
+            return '<div class="field"><label>' + esc(label(key)) + ' ' + (i+1) + '</label><input data-path="' + esc(p.join(",")) + '" value="' + esc(item) + '"><button class="mini warn" data-del="' + esc(p.join(",")) + '">删除</button></div>';
+          }).join("") + '</div>';
+      }
+      if(val && typeof val === "object"){
+        return Object.keys(val).map(function(k){ return fieldHtml(val[k],path.concat([k]),k); }).join("");
+      }
+      if(typeof val === "boolean"){
+        return '<div class="field"><label>' + esc(label(key)) + '</label><select data-path="' + esc(path.join(",")) + '"><option value="true" ' + (val?'selected':'') + '>对 / true</option><option value="false" ' + (!val?'selected':'') + '>不对 / false</option></select></div>';
+      }
+      var isLong = String(val || "").length > 34 || key === "story" || key === "hint" || key === "objective" || key === "prompt";
+      return '<div class="field"><label>' + esc(label(key)) + '</label>' + (isLong ? '<textarea data-path="' + esc(path.join(",")) + '">' + esc(val) + '</textarea>' : '<input data-path="' + esc(path.join(",")) + '" value="' + esc(val) + '">') + '</div>';
+    }
+    function bindForm(root){
+      $all("[data-path]",root).forEach(function(el){
+        el.onchange = el.oninput = function(){
+          var p = parsePath(el.getAttribute("data-path"));
+          var old = getByPath(p);
+          var v = el.value;
+          if(typeof old === "number") v = Number(v);
+          if(typeof old === "boolean") v = v === "true";
+          setByPath(p,v);
+          renderNav();
+        };
+      });
+      $all("[data-add]",root).forEach(function(btn){ btn.onclick = function(){ addAt(parsePath(btn.getAttribute("data-add")), btn.getAttribute("data-key")); renderEditor(); }; });
+      $all("[data-del]",root).forEach(function(btn){ btn.onclick = function(){ deleteAt(parsePath(btn.getAttribute("data-del"))); renderEditor(); }; });
+      $all("[data-up]",root).forEach(function(btn){ btn.onclick = function(){ moveAt(parsePath(btn.getAttribute("data-up")),-1); renderEditor(); }; });
+      $all("[data-down]",root).forEach(function(btn){ btn.onclick = function(){ moveAt(parsePath(btn.getAttribute("data-down")),1); renderEditor(); }; });
+    }
+    function parsePath(s){ return s.split(",").filter(Boolean).map(function(x){return /^\d+$/.test(x)?Number(x):x;}); }
+    function parentPath(path){ return path.slice(0,path.length-1); }
+    function deleteAt(path){
+      var arr = getByPath(parentPath(path));
+      arr.splice(path[path.length-1],1);
+      saveContent();
+      state.editor.path = ["sections",0];
+    }
+    function moveAt(path,dir){
+      var arr = getByPath(parentPath(path)), i = path[path.length-1], j = i + dir;
+      if(j<0 || j>=arr.length) return;
+      var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+      path[path.length-1]=j; state.editor.path=path; saveContent();
+    }
+    function addAt(path,key){
+      var arr = getByPath(path);
+      arr.push(newItemFor(key));
+      saveContent();
+    }
+    function newItemFor(key){
+      if(key === "sections") return newSection();
+      if(key === "lessons") return newLesson();
+      if(key === "cards") return {big:"新卡片",title:"新学习卡",image:"🌟",hint:"这里写提示",say:"新卡片"};
+      if(key === "exercises") return {kind:"choice",prompt:"新问题",answer:"选项一",options:["选项一","选项二","选项三"],tip:"这里写提示"};
+      if(key === "pairs") return {left:"左侧",right:"右侧"};
+      if(key === "groups") return {name:"新类别",items:["项目"]};
+      if(key === "path") return [0,0];
+      return "新内容";
+    }
+    function newSection(){
+      return {id:"section-" + Date.now(),title:"新板块",icon:"🌟",color:"#e0f1ff",lessons:[newLesson()]};
+    }
+    function newLesson(){
+      return {id:"lesson-" + Date.now(),title:"新主题",icon:"🌱",type:"custom",objective:"写下学习目标",cards:[{big:"新内容",title:"新学习卡",image:"🌱",hint:"写下提示",say:"新内容"}],exercises:[{kind:"choice",prompt:"请选择正确答案",answer:"正确",options:["正确","再想想"],tip:"温和提示"}]};
+    }
+    function exportJson(){
+      var blob = new Blob([JSON.stringify(state.content,null,2)], {type:"application/json"});
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "content.json";
+      a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+    }
+    function importJson(e){
+      var file = e.target.files && e.target.files[0];
+      if(!file) return;
+      var reader = new FileReader();
+      reader.onload = function(){
+        try{
+          var data = JSON.parse(reader.result);
+          if(!data.sections) throw new Error("missing sections");
+          state.content = data; saveContent(); state.sectionId = data.sections[0].id; state.lessonId = data.sections[0].lessons[0].id; renderEditor(); render();
+        }catch(err){ alert("导入失败：请选择正确的 content.json"); }
+      };
+      reader.readAsText(file);
+    }
+    $("#parentEntry").onclick = openEditor;
+    loadContent().then(function(data){
+      state.content = data;
+      state.progress = loadProgress();
+      state.sectionId = data.sections[0] && data.sections[0].id;
+      state.lessonId = data.sections[0] && data.sections[0].lessons[0] && data.sections[0].lessons[0].id;
+      render();
+      if("speechSynthesis" in window) speechSynthesis.onvoiceschanged = function(){};
+    });
+  })();
+  </script>
+</body>
+</html>
